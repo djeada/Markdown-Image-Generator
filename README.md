@@ -1,4 +1,4 @@
-# Images-Generator
+# Markdown Image Generator
 
 
 ## Contributing
