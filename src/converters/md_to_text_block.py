@@ -1,3 +1,4 @@
+import sys
 import textwrap
 from typing import List
 
@@ -31,7 +32,9 @@ class MarkdownToTextBlock:
         ]
         self.active_parser = None
 
-    def interpret(self, content: str, max_width: int = 70) -> List[List[TextBlock]]:
+    def interpret(
+        self, content: str, max_width: int = sys.maxsize
+    ) -> List[List[TextBlock]]:
         """
         Interprets a markdown content into a list of TextBlock objects.
 
