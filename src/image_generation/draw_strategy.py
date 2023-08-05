@@ -92,6 +92,86 @@ class DrawDefault:
         return img, text_height + line_height
 
 
+class DrawList:
+    """
+    Drawing strategy for a list of texts with bullet points.
+    """
+
+    def __init__(self, text_color: str, bullet_point="\u2022 "):
+        """
+        Constructor for the DrawList class.
+
+        :param text_color: The color of the text to be drawn.
+        :param bullet_point: The symbol used for the bullet point. Defaults to "\u2022 " (bullet point symbol followed by a space).
+        """
+        self.text_color = text_color
+        self.bullet_point = bullet_point
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        """
+        Method to draw the text as a list of bullet points on the image and return the image and the new height.
+
+        :param img: The image to draw on.
+        :param text: The text to be drawn, where each line is separated by '\n'.
+        :param font: The font of the text.
+        :param current_height: The current height on the image to start drawing the text.
+        :return: A tuple containing the image with the text drawn and the new height.
+        """
+        d = ImageDraw.Draw(img)
+
+        # Width of the image
+        img_width = img.size[0]
+
+        # Estimate the number of characters that can fit in the line by using a sample character "0"
+        sample_char = "0"
+        char_width = 7
+        char_per_line = img_width // char_width - len(
+            self.bullet_point
+        )  # Adjust for the width of the bullet point
+
+        # Calculate the line height based on the size of the string "Ay"
+        line_height = 10
+
+        # Split the text into lines and draw each line as a bullet point
+        lines = text.split("\n")
+        n = current_height
+        for line in lines:
+            # Wrap the line
+            wrapped_lines = textwrap.wrap(line, width=char_per_line)
+
+            # Draw each wrapped line of text
+            for i, wrapped_line in enumerate(wrapped_lines):
+                if i == 0:  # If it's the first line of the bullet point
+                    d.text(
+                        (10, current_height),
+                        self.bullet_point + wrapped_line,
+                        fill=self.text_color,
+                        font=font,
+                    )
+                else:  # If it's a continuation line of the bullet point
+                    d.text(
+                        (10 + char_width * len(self.bullet_point), current_height),
+                        wrapped_line,
+                        fill=self.text_color,
+                        font=font,
+                    )
+
+                # Update the current height for the next line
+                current_height += line_height
+
+            # Add an extra line_height for spacing between bullet points
+            current_height += line_height
+
+        # Return image and the new current height
+        return img, current_height - n + line_height
+
+
 class DrawTable:
     """
     Class that represents a strategy to draw a table on an image using matplotlib.

@@ -4,7 +4,12 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import List
 
 from src.data.text_block import TextBlock
-from src.image_generation.draw_strategy import DrawDefault, DrawTable, DrawCode
+from src.image_generation.draw_strategy import (
+    DrawDefault,
+    DrawTable,
+    DrawCode,
+    DrawList,
+)
 
 TOP_MARGIN = 20
 
@@ -77,6 +82,7 @@ class ImageGenerator:
             "default": DrawDefault(self.text_color),
             "table": DrawTable(self.text_color),
             "code": DrawCode(),
+            "bullet": DrawList(self.text_color),
         }
         strategy = strategies.get(block.type, strategies["default"])
         _, block_height = strategy.draw(img, block.data, font, current_height)
