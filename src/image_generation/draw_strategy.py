@@ -96,6 +96,67 @@ class DrawDefault:
         return img, text_height + line_height
 
 
+class DrawTitle:
+    """
+    Title drawing strategy.
+    Ensures there are a maximum of 2 title words per line.
+    """
+
+    def __init__(self, text_color: str, padding_left: int = 80, padding_top: int = 280):
+        """
+        Constructor for the DrawTitle class.
+
+        :param text_color: The color of the text to be drawn.
+        :param padding_left: The horizontal padding from the left edge.
+        :param padding_top: The vertical padding from the top edge.
+        """
+        self.text_color = text_color
+        self.padding_left = padding_left
+        self.padding_top = padding_top
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        """
+        Method to draw the text on the image and return the image and the height of the text.
+
+        :param img: The image to draw on.
+        :param text: The text to be drawn.
+        :param font: The font of the text.
+        :param current_height: The current height on the image to draw the text.
+        :return: A tuple containing the image with the text drawn and the height of the text in pixels.
+        """
+        d = ImageDraw.Draw(img)
+
+        # Wrap the text by two words per line
+        lines = textwrap.wrap(text, width=2, break_long_words=False)
+
+        # Calculate the total height of the text based on the number of lines and the line height
+        line_height = 150
+        text_height = len(lines) * line_height
+
+        # Draw each line of text
+        for i, line in enumerate(lines):
+            width = 1000
+            x_pos = (
+                img.width - width
+            ) // 2 + self.padding_left  # Center the text horizontally considering padding
+            y_pos = self.padding_top + current_height + i * line_height
+            d.text(
+                (x_pos, y_pos),
+                line,
+                fill=self.text_color,
+                font=font,
+            )
+
+        # Return image and the new current height
+        return img, current_height + text_height + line_height
+
+
 class DrawList:
     """
     Drawing strategy for a list of texts with bullet points.

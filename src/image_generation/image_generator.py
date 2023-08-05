@@ -9,6 +9,7 @@ from src.image_generation.draw_strategy import (
     DrawTable,
     DrawCode,
     DrawList,
+    DrawTitle,
 )
 
 TOP_MARGIN = 20
@@ -18,19 +19,23 @@ class ImageGenerator:
     def __init__(
         self,
         bg_image=None,
-        width=800,
-        height=600,
+        width=1080,
+        height=1080,
         bg_color=(0, 0, 0),
         text_color=(255, 255, 255),
         font_path="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
     ):
-        self.bg_image = "../resources/page.png"
+        self.bg_image = bg_image
         self.width = width
         self.height = height
         self.bg_color = bg_color
         self.text_color = text_color
         self.font_path = font_path
         self.block_styles = {
+            "title": {
+                "font_size": int(self.height / 10),
+                "line_height": int(self.height / 15),
+            },
             "header": {
                 "font_size": int(self.height / 30),
                 "line_height": int(self.height / 25),
@@ -91,6 +96,7 @@ class ImageGenerator:
             "table": DrawTable(self.text_color),
             "code": DrawCode(),
             "bullet": DrawList(self.text_color),
+            "title": DrawTitle(self.text_color),
         }
         strategy = strategies.get(block.type, strategies["default"])
         try:
