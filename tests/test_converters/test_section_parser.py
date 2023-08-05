@@ -1,4 +1,4 @@
-from src.converters.sections_parser import SectionParser
+from src.converters.md_to_text_block.sections_parser import SectionParser
 
 
 def test_parse_sections():

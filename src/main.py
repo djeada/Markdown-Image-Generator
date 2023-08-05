@@ -1,6 +1,8 @@
 import argparse
-from src.converters.md_to_text_block import MarkdownToTextBlock
-from src.converters.md_to_title import MarkdownToTitleBlock
+
+from src.converters.md_to_text_block.md_to_text_block import \
+    MarkdownToTextBlock
+from src.converters.md_to_title.md_to_title import MarkdownToTitleBlock
 from src.input_output.markdown_reader import MarkdownReader
 from src.image_generation.image_generator import ImageGenerator
 

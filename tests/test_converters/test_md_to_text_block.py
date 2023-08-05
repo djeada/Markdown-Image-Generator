@@ -1,4 +1,5 @@
-from src.converters.md_to_text_block import MarkdownToTextBlock
+from src.converters.md_to_text_block.md_to_text_block import \
+    MarkdownToTextBlock
 from src.data.text_block import TextBlock
 
 

@@ -2,13 +2,13 @@ import sys
 import textwrap
 from typing import List
 
-from src.converters.block_parser import (
+from src.converters.md_to_text_block.block_parser import (
     TableBlockParser,
     CodeBlockParser,
     BulletListBlockParser,
     HeaderParser,
 )
-from src.converters.sections_parser import SectionParser
+from src.converters.md_to_text_block.sections_parser import SectionParser
 from src.data.text_block import TextBlock
 
 

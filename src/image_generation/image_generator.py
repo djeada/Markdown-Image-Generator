@@ -1,6 +1,4 @@
-import textwrap
-
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageFont
 from typing import List
 
 from src.data.text_block import TextBlock
