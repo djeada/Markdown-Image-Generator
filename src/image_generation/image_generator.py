@@ -20,11 +20,11 @@ class ImageGenerator:
         bg_image=None,
         width=800,
         height=600,
-        bg_color=(255, 255, 255),
-        text_color=(0, 0, 0),
+        bg_color=(0, 0, 0),
+        text_color=(255, 255, 255),
         font_path="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
     ):
-        self.bg_image = bg_image
+        self.bg_image = "../resources/page.png"
         self.width = width
         self.height = height
         self.bg_color = bg_color
@@ -44,15 +44,23 @@ class ImageGenerator:
     def generate_images(self, blocks: List[TextBlock]):
         images = [self.create_new_image()]
         current_height = TOP_MARGIN
+
         for block in blocks:
             img = images[-1]
-            block_height = self.draw_text_on_image(img, block, current_height)
-            current_height += block_height
 
-            if 50 + current_height > self.height:
-                current_height = TOP_MARGIN
+            # Draw on a temporary canvas to get the block height
+            temp_canvas = self.create_new_image()
+            block_height = self.draw_text_on_image(temp_canvas, block, TOP_MARGIN)
+
+            # Check if the block can fit on the current image
+            if current_height + block_height + TOP_MARGIN > self.height:
                 img = self.create_new_image()
                 images.append(img)
+                current_height = TOP_MARGIN
+
+            # Now draw the block on the appropriate image
+            self.draw_text_on_image(img, block, current_height)
+            current_height += block_height
 
         return images
 
@@ -85,5 +93,8 @@ class ImageGenerator:
             "bullet": DrawList(self.text_color),
         }
         strategy = strategies.get(block.type, strategies["default"])
-        _, block_height = strategy.draw(img, block.data, font, current_height)
-        return block_height
+        try:
+            _, block_height = strategy.draw(img, block.data, font, current_height)
+            return block_height
+        except:
+            return 0

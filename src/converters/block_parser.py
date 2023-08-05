@@ -63,7 +63,7 @@ class CodeBlockParser(BlockParser):
 
     def is_start_line(self, line: str) -> bool:
         stripped_line = line.strip()
-        if not self.is_parsing and stripped_line == "```":
+        if not self.is_parsing and stripped_line.startswith("```"):
             self.is_parsing = True
             return True
         return False
@@ -71,6 +71,7 @@ class CodeBlockParser(BlockParser):
     def is_end_line(self, line: str) -> bool:
         stripped_line = line.strip()
         if self.is_parsing and stripped_line == "```":
+            self.content.append(stripped_line)
             self.is_parsing = False
             return True
         return False
@@ -79,9 +80,9 @@ class CodeBlockParser(BlockParser):
         if not self.is_parsing:
             return
 
-        line = line.replace("`", "").strip()
-        if line:
-            self.content.append(line)
+        # line = line.replace("`", "").strip()
+        # if line:
+        self.content.append(line)
 
     def get_block(self) -> TextBlock:
         block = TextBlock("code", "\n".join(self.content))

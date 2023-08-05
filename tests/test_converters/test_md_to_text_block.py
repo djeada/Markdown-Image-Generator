@@ -42,7 +42,7 @@ def test_markdown_interpreter_code_block():
 
     * This is a bullet point.
 
-    ```
+    ```c++
     int a = 10;
     int b = 30;
     ```
@@ -51,7 +51,7 @@ def test_markdown_interpreter_code_block():
     expected = [
         TextBlock("header", "Header 1"),
         TextBlock("bullet", "This is a bullet point."),
-        TextBlock("code", "int a = 10;\nint b = 30;"),
+        TextBlock("code", "```c++\nint a = 10;\nint b = 30;\n```"),
     ]
     assert result == expected
 

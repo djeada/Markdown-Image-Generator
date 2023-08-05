@@ -1,7 +1,6 @@
 import re
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
@@ -11,6 +10,11 @@ import io
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.table import Table
+from io import BytesIO
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import ImageFormatter
+from typing import Tuple
 
 
 class DrawStrategy(ABC):
@@ -184,6 +188,7 @@ class DrawTable:
         :param text_color: The color of the text to be drawn.
         """
         self.text_color = text_color
+        self.scale_factor = 0.8
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -205,7 +210,7 @@ class DrawTable:
         # Calculate the height of the table
         table_height = table_img.size[1]
 
-        return img, table_height
+        return img, table_height * self.scale_factor
 
     def text_to_dataframe(self, text: str) -> pd.DataFrame:
         """
@@ -238,18 +243,17 @@ class DrawTable:
         fig_width = img_width / 80  # Convert pixel to inches, assuming 80 dpi
         fig_height = 4  # Adjust this value as needed
 
-        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        # Set transparent background with the facecolor parameter
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="none")
         ax.axis("off")
         table = Table(ax, bbox=[0, 0, 1, 1])
 
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        # Define a wrapping width
         wrapping_width = 25
 
         for (i, j), val in np.ndenumerate(df):
-            # Wrap the text in each cell
             val = textwrap.fill(str(val), width=wrapping_width)
             table.add_cell(
                 i,
@@ -262,7 +266,6 @@ class DrawTable:
             )
 
         for i, label in enumerate(df.columns):
-            # Also wrap the column headers
             label = textwrap.fill(str(label), width=wrapping_width)
             table.add_cell(
                 -1,
@@ -283,6 +286,8 @@ class DrawTable:
 
         canvas = FigureCanvasAgg(fig)
         canvas.draw()
+
+        # Get the buffer in RGBA format
         buf = canvas.buffer_rgba()
         array = np.asarray(buf)
         table_img = Image.fromarray(array)
@@ -301,11 +306,103 @@ class DrawTable:
         :param current_height: The current height on the main image to add the table.
         :return: The main image with the table added.
         """
-        img.paste(table_img, (0, current_height))
+
+        r, g, b, a = table_img.split()
+        rgb_img = Image.merge("RGB", (r, g, b))
+
+        # Resize the image and its alpha channel separately
+        new_width = int(table_img.width * self.scale_factor)
+        new_height = int(table_img.height * self.scale_factor)
+        resized_img = rgb_img.resize((new_width, new_height), Image.LANCZOS)
+        resized_alpha = a.resize((new_width, new_height), Image.LANCZOS)
+
+        # Merge them back together
+        resized_table_img = Image.merge(
+            "RGBA",
+            (
+                resized_img.split()[0],
+                resized_img.split()[1],
+                resized_img.split()[2],
+                resized_alpha,
+            ),
+        )
+
+        # Paste the resized table_img onto the main image
+        img.paste(
+            resized_table_img, (0, current_height), mask=resized_table_img.split()[3]
+        )
+
         return img
 
 
-class DrawCode(DrawStrategy):
-    def draw(self, img, text, font, current_height):
-        # Implement your strategy for drawing code here
+class DrawCode:
+    """
+    Drawing strategy for a block of code.
+    """
+
+    def __init__(self):
+        """
+        Constructor for the DrawCode class.
+
+        :param lexer_name: The name of the lexer to use for syntax highlighting, e.g., "python".
+        """
         pass
+
+    def _extract_lexer_name(self, text: str) -> Tuple[str, str]:
+        """
+        Extract lexer name from text and return the cleaned text.
+
+        :param text: The input code text which includes the lexer name.
+        :return: Tuple containing lexer name and cleaned text.
+        """
+        # Match the format similar to markdown code blocks
+        match = re.match(r"^\s*```\s*([\w+-]+)", text)
+
+        if match:
+            lexer_name = match.group(1)
+            # Strip the lexer name line from the text
+            text = text[match.end() :].lstrip()
+        else:
+            lexer_name = "text"  # Default lexer
+
+        # Remove any trailing code block marks
+        text = re.sub(r"```\s*$", "", text).rstrip()
+
+        return lexer_name, text
+
+    def draw(
+        self, img: Image.Image, code: str, _, current_height: int
+    ) -> Tuple[Image.Image, int]:
+        """
+        Method to draw a block of code on the image and return the image and the new height.
+
+        :param img: The image to draw on.
+        :param code: The code to be drawn.
+        :param current_height: The current height on the image to start drawing the code.
+        :return: A tuple containing the image with the code drawn and the new height.
+        """
+        # Extract lexer name from code text
+        lexer_name, cleaned_code = self._extract_lexer_name(code)
+
+        # Fetch the lexer for the provided language
+        try:
+            lexer = get_lexer_by_name(lexer_name)
+        except:
+            lexer = get_lexer_by_name("text")  # Use a basic lexer if unknown language
+
+        # Highlight the code and generate an image
+        highlighted_code = highlight(
+            cleaned_code, lexer, ImageFormatter(line_numbers=False)
+        )
+
+        # Load the highlighted code image into PIL
+        code_img = Image.open(BytesIO(highlighted_code))
+
+        # Calculate the horizontal position for centering the code image
+        x_position = (img.width - code_img.width) // 2
+
+        # Paste the code image onto the main image at the centered position
+        img.paste(code_img, (x_position, current_height))
+
+        # Return the main image and the updated height
+        return img, current_height + code_img.size[1]
