@@ -40,17 +40,14 @@ class ImageGenerator:
         images = [self.create_new_image()]
         current_height = TOP_MARGIN
         for block in blocks:
-            if self.get_block_height(block.type) + current_height > self.height:
+            img = images[-1]
+            block_height = self.draw_text_on_image(img, block, current_height)
+            current_height += block_height
+
+            if 50 + current_height > self.height:
                 current_height = TOP_MARGIN
                 img = self.create_new_image()
                 images.append(img)
-            else:
-                img = images[-1]
-
-            self.draw_text_on_image(img, block, current_height)
-            current_height += self.get_block_height(
-                block.type
-            )  # update the height for the next block
 
         return images
 
@@ -71,29 +68,10 @@ class ImageGenerator:
             print(f"Error: The block type {block.type} isn't supported.")
             return None
 
-    def get_wrapped_text(self, block, font):
-        # Wrap the text
-        wrapped_text = textwrap.fill(
-            block.data, width=int(self.width / (font.size / 2))
-        )
-        return wrapped_text
-
-    def get_block_height(self, block_type):
-        # Get the height of the wrapped text
-        if block_type == "table":
-            return 200
-
-        block_height = 2 * TOP_MARGIN
-        return block_height
-
     def draw_text_on_image(self, img, block, current_height):
         font = self.get_font_for_block(block)
         if not font:
             return
-
-        wrapped_text = (
-            self.get_wrapped_text(block, font) if block.type != "table" else block.data
-        )
 
         strategies = {
             "default": DrawDefault(self.text_color),
@@ -101,4 +79,5 @@ class ImageGenerator:
             "code": DrawCode(),
         }
         strategy = strategies.get(block.type, strategies["default"])
-        strategy.draw(img, wrapped_text, font, current_height)
+        _, block_height = strategy.draw(img, block.data, font, current_height)
+        return block_height
