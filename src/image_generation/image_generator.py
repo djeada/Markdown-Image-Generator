@@ -72,8 +72,9 @@ class ImageGenerator:
 
             # Check if the block can fit on the current image
             if current_height + block_height + TOP_MARGIN > self.height:
-                # Finalize the page number on the previous page before creating a new page
-                self.draw_page_number(img, current_page)
+                if block.type != "title":
+                    # Finalize the page number on the previous page before creating a new page
+                    self.draw_page_number(img, current_page)
 
                 img = self.create_new_image()
                 images.append(img)
@@ -83,9 +84,9 @@ class ImageGenerator:
             # Now draw the block on the appropriate image
             self.draw_text_on_image(img, block, current_height)
             current_height += block_height
-
-        # Draw the page number on the last page
-        self.draw_page_number(images[-1], current_page)
+        if block.type != "title":
+            # Draw the page number on the last page
+            self.draw_page_number(images[-1], current_page)
 
         return images
 

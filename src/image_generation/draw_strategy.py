@@ -109,7 +109,12 @@ class DrawTitle:
     Ensures there are a maximum of 2 title words per line.
     """
 
-    def __init__(self, text_color: str, padding_left: int = 80, padding_top: int = 280):
+    def __init__(
+        self,
+        text_color: str,
+        padding_left: int = Config.get_instance().get("PAGE_RIGHT_MARGIN"),
+        padding_top: int = Config.get_instance().get("PAGE_TOP_MARGIN"),
+    ):
         """
         Constructor for the DrawTitle class.
 
@@ -140,7 +145,7 @@ class DrawTitle:
         d = ImageDraw.Draw(img)
 
         # Wrap the text by two words per line
-        lines = textwrap.wrap(text, width=2, break_long_words=False)
+        lines = textwrap.wrap(text, width=12, break_long_words=False)
 
         # Calculate the total height of the text based on the number of lines and the line height
         line_height = 150
@@ -260,8 +265,9 @@ class DrawTable:
 
         :param text_color: The color of the text to be drawn.
         """
-        self.text_color = text_color
         self.scale_factor = Config.get_instance().get("TABLE_SCALE_FACTOR")
+        self.background_color = Config.get_instance().get("TABLE_BG_COLOR")
+        self.text_color = Config.get_instance().get("TABLE_FG_COLOR")
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -283,7 +289,7 @@ class DrawTable:
         # Calculate the height of the table
         table_height = table_img.size[1]
 
-        return img, table_height * self.scale_factor
+        return img, table_height * self.scale_factor + 20
 
     def text_to_dataframe(self, text: str) -> pd.DataFrame:
         """
@@ -313,8 +319,9 @@ class DrawTable:
         :param img_width: The width of the image to fit the table.
         :return: The table as an image.
         """
+        img_width = 0.8 * img_width
         fig_width = img_width / 80  # Convert pixel to inches, assuming 80 dpi
-        fig_height = 4  # Adjust this value as needed
+        fig_height = 6  # Adjust this value as needed
 
         # Set transparent background with the facecolor parameter
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="none")
@@ -324,19 +331,20 @@ class DrawTable:
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        wrapping_width = 25
+        wrapping_width = 20
 
         for (i, j), val in np.ndenumerate(df):
             val = textwrap.fill(str(val), width=wrapping_width)
-            table.add_cell(
+            cell = table.add_cell(
                 i,
                 j,
                 width=width,
                 height=height,
                 text=val,
                 loc="left",
-                facecolor="white",
+                facecolor=self.background_color,
             )
+            cell.get_text().set_color(self.text_color)  # set color to blue
 
         for i, label in enumerate(df.columns):
             label = textwrap.fill(str(label), width=wrapping_width)
@@ -344,14 +352,14 @@ class DrawTable:
                 -1,
                 i,
                 width=width,
-                height=0.1,
+                height=0.2,
                 text=label,
                 loc="center",
-                facecolor="grey",
+                facecolor="#8c52ff",
             )
 
         table.auto_set_font_size(False)
-        table.set_fontsize(10)
+        table.set_fontsize(15)
         table.scale(1, 1.5)
 
         ax.add_table(table)

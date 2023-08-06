@@ -51,7 +51,7 @@ class MarkdownToImageConverter:
 
         # Ensure text_blocks is a list for uniform handling
         if not isinstance(text_blocks, list):
-            text_blocks = [text_blocks]
+            text_blocks = [[text_blocks]]
 
         for text_block in text_blocks:
             images = self.image_generator.generate_images(text_block)
@@ -63,7 +63,7 @@ class MarkdownToImageConverter:
         page_types = {
             "intro": (self.interpret_title, "../resources/intro.png"),
             "normal": (self.interpret_normal_page, "../resources/page.png"),
-            "final": (self.interpret_final_page, "../resources/final.png"),
+            "final": (self.interpret_title, "../resources/final.png"),
         }
 
         if page_type not in page_types:

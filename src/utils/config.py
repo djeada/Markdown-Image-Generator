@@ -10,7 +10,7 @@ class Config:
     _default_values = {
         "PAGE_TOP_MARGIN": 250,
         "PAGE_RIGHT_MARGIN": 80,
-        "PAGE_NUMBER_FONT_COLOR": "#484524",
+        "PAGE_NUMBER_FONT_COLOR": "#292929",
         "TEXT_COLOR": "#FFFFFF",
         "BG_COLOR": "#000000",
         "IMAGE_WIDTH": 1080,
@@ -24,6 +24,8 @@ class Config:
         "CODE_BLOCK_RADIUS": 20,
         "CODE_BLOCK_TOP_PADDING": 50,
         "START_INDEX": 0,
+        "TABLE_FG_COLOR": "#FFFFFF",
+        "TABLE_BG_COLOR": "#292929",
         # Add more default values as needed
     }
 
