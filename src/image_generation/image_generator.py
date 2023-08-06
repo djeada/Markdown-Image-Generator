@@ -9,16 +9,15 @@ from src.image_generation.draw_strategy import (
     DrawList,
     DrawTitle,
 )
-
-TOP_MARGIN = 20
+from src.utils.config import Config
 
 
 class ImageGenerator:
     def __init__(
         self,
         bg_image=None,
-        width=1080,
-        height=1080,
+        width=Config.get_instance().get("IMAGE_WIDTH"),
+        height=Config.get_instance().get("IMAGE_HEIGHT"),
         bg_color=(0, 0, 0),
         text_color=(255, 255, 255),
         font_path="/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
@@ -45,6 +44,7 @@ class ImageGenerator:
         }
 
     def generate_images(self, blocks: List[TextBlock]):
+        TOP_MARGIN = Config.get_instance().get("PAGE_TOP_MARGIN")
         images = [self.create_new_image()]
         current_height = TOP_MARGIN
 

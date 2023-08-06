@@ -16,6 +16,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import ImageFormatter
 from typing import Tuple
 
+from src.utils.config import Config
+
 
 class DrawStrategy(ABC):
     """
@@ -73,20 +75,22 @@ class DrawDefault:
         img_width = img.size[0]
 
         # Estimate the number of characters that can fit in the line
-        char_width = 7
-        char_per_line = img_width // char_width
+        char_per_line = img_width // Config.get_instance().get("CHAR_WIDTH")
 
         # Wrap the text
         lines = textwrap.wrap(text, width=char_per_line)
 
         # Calculate the total height of the text based on the number of lines and the line height
-        line_height = 20
+        line_height = Config.get_instance().get("DEFAULT_LINE_HEIGHT")
         text_height = len(lines) * line_height
 
         # Draw each line of text
         for i, line in enumerate(lines):
             d.text(
-                (10, current_height + i * line_height),
+                (
+                    Config.get_instance().get("PAGE_RIGHT_MARGIN"),
+                    current_height + i * line_height,
+                ),
                 line,
                 fill=self.text_color,
                 font=font,
@@ -193,15 +197,12 @@ class DrawList:
         # Width of the image
         img_width = img.size[0]
 
-        # Estimate the number of characters that can fit in the line by using a sample character "0"
-        sample_char = "0"
-        char_width = 7
-        char_per_line = img_width // char_width - len(
+        char_per_line = img_width // Config.get_instance().get("CHAR_WIDTH") - len(
             self.bullet_point
         )  # Adjust for the width of the bullet point
 
         # Calculate the line height based on the size of the string "Ay"
-        line_height = 10
+        line_height = Config.get_instance().get("LIST_LINE_HEIGHT")
 
         # Split the text into lines and draw each line as a bullet point
         lines = text.split("\n")
@@ -214,14 +215,22 @@ class DrawList:
             for i, wrapped_line in enumerate(wrapped_lines):
                 if i == 0:  # If it's the first line of the bullet point
                     d.text(
-                        (10, current_height),
+                        (
+                            Config.get_instance().get("PAGE_RIGHT_MARGIN"),
+                            current_height,
+                        ),
                         self.bullet_point + wrapped_line,
                         fill=self.text_color,
                         font=font,
                     )
                 else:  # If it's a continuation line of the bullet point
                     d.text(
-                        (10 + char_width * len(self.bullet_point), current_height),
+                        (
+                            10
+                            + Config.get_instance().get("CHAR_WIDTH")
+                            * len(self.bullet_point),
+                            current_height,
+                        ),
                         wrapped_line,
                         fill=self.text_color,
                         font=font,
