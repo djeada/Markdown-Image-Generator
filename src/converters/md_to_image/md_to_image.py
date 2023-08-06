@@ -1,4 +1,5 @@
-from typing import List, Union, Optional
+import time
+from typing import List, Optional
 
 from src.converters.md_to_text_block.md_to_text_block import MarkdownToTextBlock
 from src.converters.md_to_title.md_to_title import MarkdownToTitleBlock
@@ -55,6 +56,7 @@ class MarkdownToImageConverter:
         for text_block in text_blocks:
             images = self.image_generator.generate_images(text_block)
             self.handle_output(images)
+            time.sleep(0.1)
 
     def convert(self, page_type: str) -> None:
         """Convert markdown to images based on the specified page type."""

@@ -16,7 +16,10 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import ImageFormatter
 from typing import Tuple
 
+from pygments.styles import get_style_by_name
+
 from src.utils.config import Config
+from src.utils.other import hex_to_rgba
 
 
 class DrawStrategy(ABC):
@@ -258,7 +261,7 @@ class DrawTable:
         :param text_color: The color of the text to be drawn.
         """
         self.text_color = text_color
-        self.scale_factor = 0.8
+        self.scale_factor = Config.get_instance().get("TABLE_SCALE_FACTOR")
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -397,9 +400,14 @@ class DrawTable:
             ),
         )
 
+        # Calculate horizontal offset for centering
+        horizontal_offset = (img.width - resized_table_img.width) // 2
+
         # Paste the resized table_img onto the main image
         img.paste(
-            resized_table_img, (0, current_height), mask=resized_table_img.split()[3]
+            resized_table_img,
+            (horizontal_offset, current_height),
+            mask=resized_table_img.split()[3],
         )
 
         return img
@@ -416,7 +424,7 @@ class DrawCode:
 
         :param lexer_name: The name of the lexer to use for syntax highlighting, e.g., "python".
         """
-        pass
+        self.scale_factor = Config.get_instance().get("CODE_BLOCK_SCALE_FACTOR")
 
     def _extract_lexer_name(self, text: str) -> Tuple[str, str]:
         """
@@ -426,8 +434,7 @@ class DrawCode:
         :return: Tuple containing lexer name and cleaned text.
         """
         # Match the format similar to markdown code blocks
-        match = re.match(r"^\s*```\s*([\w+-]+)", text)
-
+        match = re.match(r"^[ \t]*```([\w+-]+)", text)
         if match:
             lexer_name = match.group(1)
             # Strip the lexer name line from the text
@@ -436,43 +443,127 @@ class DrawCode:
             lexer_name = "text"  # Default lexer
 
         # Remove any trailing code block marks
-        text = re.sub(r"```\s*$", "", text).rstrip()
+        text = text.replace("```", "")
 
         return lexer_name, text
+
+    def _get_lexer(self, lexer_name: str):
+        """Get the lexer based on the lexer name."""
+        try:
+            return get_lexer_by_name(lexer_name)
+        except:
+            return get_lexer_by_name(
+                "text"
+            )  # Default to basic lexer for unknown language
+
+    def _create_rounded_rect(
+        self, width: int, height: int, corner_radius: int = 10, padding: int = 10
+    ) -> Image.Image:
+        """Create a rounded rectangle image."""
+        scale_factor = 4  # we'll draw everything 4 times larger and then resize it
+
+        # Adjust all the dimensions and positions for the scale factor
+        width *= scale_factor
+        height *= scale_factor
+        corner_radius *= scale_factor
+        padding *= scale_factor
+        circle_radius = 8 * scale_factor
+        circle_padding = 4 * scale_factor
+
+        rounded_rect = Image.new(
+            "RGBA", (width + 2 * padding, height + 2 * padding), (255, 255, 255, 0)
+        )
+        draw = ImageDraw.Draw(rounded_rect)
+
+        draw.rounded_rectangle(
+            (0, 0, rounded_rect.width, rounded_rect.height),
+            fill=hex_to_rgba(Config.get_instance().get("CODE_BLOCK_BG")),
+            radius=corner_radius,
+        )
+
+        colors = ["#ff5757", "#ffde59", "#7ed957"]
+
+        # Draw the circles
+        for idx, color in enumerate(colors):
+            circle_x = (
+                padding + idx * (circle_radius * 2 + circle_padding) + circle_radius
+            )
+            circle_y = padding + circle_radius
+            left_up_point = (circle_x - circle_radius, circle_y - circle_radius)
+            right_down_point = (circle_x + circle_radius, circle_y + circle_radius)
+
+            draw.ellipse([left_up_point, right_down_point], fill=color)
+
+        # Draw a horizontal thin line in the middle
+        line_thickness = 1 * scale_factor  # you can adjust the thickness here
+        line_y = 2 * (padding + circle_radius)
+        draw.line(
+            [(padding, line_y), (rounded_rect.width - padding, line_y)],
+            fill="grey",
+            width=line_thickness,
+        )
+
+        # Downscale the image to achieve anti-aliasing and smoother results
+        rounded_rect = rounded_rect.resize(
+            (rounded_rect.width // scale_factor, rounded_rect.height // scale_factor),
+            resample=Image.LANCZOS,
+        )
+
+        return rounded_rect
+
+    def _ensure_alpha_channel(self, img: Image.Image) -> Image.Image:
+        """Ensure that the image has an alpha channel."""
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+            alpha = Image.new("L", img.size, 255)  # Fully opaque alpha channel
+            img.putalpha(alpha)
+        return img
+
+    def _paste_onto_image(self, img, rounded_rect, current_height):
+        scaled_rounded_rect_width = int(rounded_rect.width * self.scale_factor)
+        x_position = (img.width - scaled_rounded_rect_width) // 2
+
+        scaled_rounded_rect_height = int(rounded_rect.height * self.scale_factor)
+        height_difference = (rounded_rect.height - scaled_rounded_rect_height) // 2
+
+        scaled_rounded_rect = rounded_rect.resize(
+            (scaled_rounded_rect_width, scaled_rounded_rect_height)
+        )
+        img.paste(
+            scaled_rounded_rect,
+            (x_position, current_height),
+            scaled_rounded_rect,
+        )
+
+        return img, current_height + scaled_rounded_rect.size[1]
 
     def draw(
         self, img: Image.Image, code: str, _, current_height: int
     ) -> Tuple[Image.Image, int]:
-        """
-        Method to draw a block of code on the image and return the image and the new height.
-
-        :param img: The image to draw on.
-        :param code: The code to be drawn.
-        :param current_height: The current height on the image to start drawing the code.
-        :return: A tuple containing the image with the code drawn and the new height.
-        """
-        # Extract lexer name from code text
         lexer_name, cleaned_code = self._extract_lexer_name(code)
+        lexer = self._get_lexer(lexer_name)
 
-        # Fetch the lexer for the provided language
-        try:
-            lexer = get_lexer_by_name(lexer_name)
-        except:
-            lexer = get_lexer_by_name("text")  # Use a basic lexer if unknown language
-
-        # Highlight the code and generate an image
         highlighted_code = highlight(
-            cleaned_code, lexer, ImageFormatter(line_numbers=False)
+            cleaned_code,
+            lexer,
+            ImageFormatter(style=get_style_by_name("vim"), line_numbers=False),
         )
 
-        # Load the highlighted code image into PIL
         code_img = Image.open(BytesIO(highlighted_code))
+        code_img = self._ensure_alpha_channel(code_img)
 
-        # Calculate the horizontal position for centering the code image
-        x_position = (img.width - code_img.width) // 2
+        rounded_rect = self._create_rounded_rect(
+            code_img.width,
+            code_img.height + Config.get_instance().get("CODE_BLOCK_TOP_PADDING"),
+            Config.get_instance().get("CODE_BLOCK_RADIUS"),
+            Config.get_instance().get("CODE_BLOCK_RADIUS"),
+        )
+        rounded_rect.paste(
+            code_img,
+            (10, 10 + Config.get_instance().get("CODE_BLOCK_TOP_PADDING")),
+            code_img,
+        )  # 10 is the padding
 
-        # Paste the code image onto the main image at the centered position
-        img.paste(code_img, (x_position, current_height))
+        img, height = self._paste_onto_image(img, rounded_rect, current_height)
 
-        # Return the main image and the updated height
-        return img, current_height + code_img.size[1]
+        return img, height

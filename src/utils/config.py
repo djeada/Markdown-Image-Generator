@@ -10,11 +10,20 @@ class Config:
     _default_values = {
         "PAGE_TOP_MARGIN": 250,
         "PAGE_RIGHT_MARGIN": 80,
+        "PAGE_NUMBER_FONT_COLOR": "#484524",
+        "TEXT_COLOR": "#FFFFFF",
+        "BG_COLOR": "#000000",
         "IMAGE_WIDTH": 1080,
         "IMAGE_HEIGHT": 1080,
         "CHAR_WIDTH": 15,
         "DEFAULT_LINE_HEIGHT": 30,
-        "LIST_LINE_HEIGHT": 20
+        "LIST_LINE_HEIGHT": 20,
+        "TABLE_SCALE_FACTOR": 1,
+        "CODE_BLOCK_SCALE_FACTOR": 2,
+        "CODE_BLOCK_BG": "#000000",
+        "CODE_BLOCK_RADIUS": 20,
+        "CODE_BLOCK_TOP_PADDING": 50,
+        "START_INDEX": 0,
         # Add more default values as needed
     }
 
