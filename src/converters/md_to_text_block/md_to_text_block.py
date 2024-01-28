@@ -76,7 +76,7 @@ class MarkdownToTextBlock:
         self.active_parser = None
 
         for line in lines:
-            line = line.strip()
+            # line = line.strip()
             if not self.active_parser:
                 for parser in self.parsers:
                     if parser.is_start_line(line):

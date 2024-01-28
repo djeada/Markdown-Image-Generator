@@ -14,7 +14,7 @@ from io import BytesIO
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import ImageFormatter
-from typing import Tuple
+from typing import Tuple, List
 
 from pygments.styles import get_style_by_name
 
@@ -44,17 +44,23 @@ class DrawStrategy(ABC):
 
 
 class DrawDefault:
-    """
-    Default drawing strategy.
-    """
+    CHAR_WIDTH = 10  # Example character width, adjust as needed
+    LINE_HEIGHT = 50  # Example line height, adjust as needed
 
-    def __init__(self, text_color: str):
-        """
-        Constructor for the DrawDefault class.
-
-        :param text_color: The color of the text to be drawn.
-        """
+    def __init__(self, text_color: str, highlight_color: str = "#ffab00"):
         self.text_color = text_color
+        self.highlight_color = highlight_color
+
+    def find_highlighted_sections(self, text: str) -> List[Tuple[int, int]]:
+        highlights = []
+        start = None
+        for i, char in enumerate(text):
+            if char == "*" and start is None:
+                start = i
+            elif char == "*" and start is not None:
+                highlights.append((start, i))
+                start = None
+        return highlights
 
     def draw(
         self,
@@ -63,44 +69,62 @@ class DrawDefault:
         font: ImageFont.FreeTypeFont,
         current_height: int,
     ) -> Tuple[Image.Image, int]:
-        """
-        Method to draw the text on the image and return the image and the height of the text.
 
-        :param img: The image to draw on.
-        :param text: The text to be drawn.
-        :param font: The font of the text.
-        :param current_height: The current height on the image to draw the text.
-        :return: A tuple containing the image with the text drawn and the height of the text in pixels.
-        """
+        if text.strip()[0].isdigit():
+            current_height += DrawDefault.LINE_HEIGHT
+
         d = ImageDraw.Draw(img)
-
-        # Width of the image
         img_width = img.size[0]
 
-        # Estimate the number of characters that can fit in the line
-        char_per_line = img_width // Config.get_instance().get("CHAR_WIDTH")
-
-        # Wrap the text
+        char_per_line = img_width // DrawDefault.CHAR_WIDTH
         lines = textwrap.wrap(text, width=char_per_line)
 
-        # Calculate the total height of the text based on the number of lines and the line height
-        line_height = Config.get_instance().get("DEFAULT_LINE_HEIGHT")
-        text_height = len(lines) * line_height
+        highlighted_sections = self.find_highlighted_sections(text)
+        print(lines, current_height)
 
-        # Draw each line of text
-        for i, line in enumerate(lines):
-            d.text(
-                (
-                    Config.get_instance().get("PAGE_RIGHT_MARGIN"),
-                    current_height + i * line_height,
-                ),
-                line,
-                fill=self.text_color,
-                font=font,
-            )
+        for line in lines:
+            text_width = Config.get_instance().get("PAGE_RIGHT_MARGIN")
+            start_pos = 0
+            for section_start, section_end in highlighted_sections:
+                # Draw the non-highlighted part
+                before_highlight = text[start_pos:section_start]
+                if before_highlight:
+                    d.text(
+                        (text_width, current_height),
+                        before_highlight,
+                        fill=self.text_color,
+                        font=font,
+                    )
+                    text_width += font.getmask(before_highlight).getbbox()[2]
+                start_pos = section_end + 1
 
-        # Return image and the new current height
-        return img, text_height + line_height
+                # Draw the highlighted part
+                if section_start < len(text) and section_end < len(text):
+                    text_width += DrawDefault.CHAR_WIDTH
+                    highlight_text = text[
+                        section_start + 1 : section_end
+                    ]  # Exclude asterisks
+                    d.text(
+                        (text_width, current_height),
+                        highlight_text,
+                        fill=self.highlight_color,
+                        font=font,
+                    )
+                    text_width += font.getmask(highlight_text).getbbox()[2]
+            # Draw the remaining part of the line, if any
+            remaining_text = text[start_pos:]
+            if remaining_text:
+                d.text(
+                    (text_width, current_height),
+                    remaining_text,
+                    fill=self.text_color,
+                    font=font,
+                )
+
+            # Move to the next line
+            current_height += DrawDefault.LINE_HEIGHT
+
+        return img, current_height
 
 
 class DrawTitle:
@@ -145,10 +169,10 @@ class DrawTitle:
         d = ImageDraw.Draw(img)
 
         # Wrap the text by two words per line
-        lines = textwrap.wrap(text, width=12, break_long_words=False)
+        lines = textwrap.wrap(text, width=24, break_long_words=False)
 
         # Calculate the total height of the text based on the number of lines and the line height
-        line_height = 150
+        line_height = 100  # 150 title # 100 other
         text_height = len(lines) * line_height
 
         # Draw each line of text
@@ -319,9 +343,9 @@ class DrawTable:
         :param img_width: The width of the image to fit the table.
         :return: The table as an image.
         """
-        img_width = 0.8 * img_width
+        img_width = 0.9 * img_width
         fig_width = img_width / 80  # Convert pixel to inches, assuming 80 dpi
-        fig_height = 6  # Adjust this value as needed
+        fig_height = 8  # Adjust this value as needed
 
         # Set transparent background with the facecolor parameter
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="none")
@@ -331,7 +355,7 @@ class DrawTable:
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        wrapping_width = 20
+        wrapping_width = 23  # Adjust this value as needed
 
         for (i, j), val in np.ndenumerate(df):
             val = textwrap.fill(str(val), width=wrapping_width)
@@ -574,4 +598,4 @@ class DrawCode:
 
         img, height = self._paste_onto_image(img, rounded_rect, current_height)
 
-        return img, height
+        return img, 790

@@ -12,7 +12,7 @@ def main():
         "-t",
         "--page_type",
         dest="page_type",
-        choices=["intro", "normal", "final"],
+        choices=["intro", "normal", "final", "question"],
         default="normal",
         help="Type of page: intro, normal, or final.",
         required=False,

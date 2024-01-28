@@ -64,6 +64,7 @@ class MarkdownToImageConverter:
             "intro": (self.interpret_title, "../resources/intro.png"),
             "normal": (self.interpret_normal_page, "../resources/page.png"),
             "final": (self.interpret_title, "../resources/final.png"),
+            "question": (self.interpret_title, "../resources/challenge.png"),
         }
 
         if page_type not in page_types:

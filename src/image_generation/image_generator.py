@@ -1,7 +1,6 @@
 from PIL import Image, ImageFont, ImageDraw
 from typing import List
 
-
 from src.data.text_block import TextBlock
 from src.image_generation.draw_strategy import (
     DrawDefault,
@@ -33,16 +32,20 @@ class ImageGenerator:
         self.start_index = start_index
         self.block_styles = {
             "title": {
-                "font_size": int(self.height / 10),
-                "line_height": int(self.height / 15),
+                "font_size": int(self.height / 15),  # / 12 title / 20 other
+                "line_height": int(self.height / 22),
             },
             "header": {
                 "font_size": int(self.height / 30),
                 "line_height": int(self.height / 25),
             },
             "paragraph": {
-                "font_size": int(self.height / 40),
-                "line_height": int(self.height / 35),
+                "font_size": int(self.height / 35)
+                if Config.get_instance().get("CHALLENGE")
+                else int(self.height / 40),
+                "line_height": int(self.height / 25)
+                if Config.get_instance().get("CHALLENGE")
+                else int(self.height / 35),
             },
         }
 
@@ -52,7 +55,9 @@ class ImageGenerator:
         draw = ImageDraw.Draw(image)
         draw.text(
             position,
-            f"{page_num +    self.start_index }",
+            f"?"
+            if Config.get_instance().get("CHALLENGE")
+            else f"{page_num + self.start_index}",
             fill=Config.get_instance().get("PAGE_NUMBER_FONT_COLOR"),
             font=self.get_font_for_block("header"),
         )
@@ -62,29 +67,25 @@ class ImageGenerator:
         images = [self.create_new_image()]
         current_height = TOP_MARGIN
         current_page = 1  # start with page 1
+        last_block_type = None  # To store the last block's type
 
         for idx, block in enumerate(blocks):
             img = images[-1]
 
-            # Draw on a temporary canvas to get the block height
-            temp_canvas = self.create_new_image()
-            block_height = self.draw_text_on_image(temp_canvas, block, TOP_MARGIN)
-
             # Check if the block can fit on the current image
-            if current_height + block_height + TOP_MARGIN > self.height:
-                if block.type != "title":
-                    # Finalize the page number on the previous page before creating a new page
-                    self.draw_page_number(img, current_page)
-
-                img = self.create_new_image()
-                images.append(img)
-                current_height = TOP_MARGIN
-                current_page += 1  # increment page number
+            # if current_height + block_height + TOP_MARGIN > self.height + 1111:
+            if last_block_type != "title":  # Check the last block type here
+                # Finalize the page number on the previous page before creating a new page
+                self.draw_page_number(img, current_page)
 
             # Now draw the block on the appropriate image
-            self.draw_text_on_image(img, block, current_height)
-            current_height += block_height
-        if block.type != "title":
+            block_height = self.draw_text_on_image(img, block, current_height)
+            current_height = block_height
+            last_block_type = (
+                block.type
+            )  # Update the last block type at the end of loop
+
+        if last_block_type != "title":  # Check the last block type here
             # Draw the page number on the last page
             self.draw_page_number(images[-1], current_page)
 
@@ -123,5 +124,6 @@ class ImageGenerator:
         try:
             _, block_height = strategy.draw(img, block.data, font, current_height)
             return block_height
-        except:
+        except Exception as e:
+            print(e)
             return 0
