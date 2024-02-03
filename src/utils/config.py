@@ -1,10 +1,22 @@
 import json
-import os
+from pathlib import Path
+from typing import Any, Dict
 
 
+def singleton(cls):
+    instances = {}
+
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return get_instance
+
+
+@singleton
 class Config:
-    _instance = None
-    _config_file = "config.json"
+    _config_file = Path("config.json")
 
     # Default configuration values
     _default_values = {
@@ -29,45 +41,44 @@ class Config:
         # Add more default values as needed
     }
 
-    def __new__(cls, *args, **kwargs):
-        # Ensure a single instance (singleton pattern)
-        if not isinstance(cls._instance, cls):
-            cls._instance = super(Config, cls).__new__(cls, *args, **kwargs)
-            cls._instance.init_config()
-        return cls._instance
+    def __init__(self):
+        self._config_data: Dict[str, Any] = {}
+        self.init_config()
 
-    def init_config(self):
-        # If config file doesn't exist, create it with default values
-        if not os.path.exists(self._config_file):
-            with open(self._config_file, "w") as file:
-                json.dump(self._default_values, file)
+    def init_config(self) -> None:
+        if not self._config_file.exists():
+            self._save_defaults()
+        self._load_config()
+        self._ensure_defaults()
 
-        # Load the configuration
-        with open(self._config_file, "r") as file:
-            self._config_data = json.load(file)
+    def _load_config(self) -> None:
+        try:
+            with self._config_file.open("r") as file:
+                self._config_data = json.load(file)
+        except Exception as e:
+            print(f"Error loading configuration: {e}")
+            self._config_data = {}
 
-        # Ensure all default keys are in the loaded configuration
+    def _save_defaults(self) -> None:
+        with self._config_file.open("w") as file:
+            json.dump(self._default_values, file, indent=4)
+
+    def _ensure_defaults(self) -> None:
+        defaults_added = False
         for key, value in self._default_values.items():
             if key not in self._config_data:
                 self._config_data[key] = value
+                defaults_added = True
+        if defaults_added:
+            self._save_config()
 
-        # Save back the configuration in case defaults were added
-        with open(self._config_file, "w") as file:
-            json.dump(self._config_data, file)
+    def _save_config(self) -> None:
+        with self._config_file.open("w") as file:
+            json.dump(self._config_data, file, indent=4)
 
-    def get(self, key, default=None):
-        # Return the value associated with key, if not found, return the default value or None
+    def get(self, key: str, default: Any = None) -> Any:
         return self._config_data.get(key, default)
 
-    def set(self, key, value):
-        # Set the value for the key and save to file
+    def set(self, key: str, value: Any) -> None:
         self._config_data[key] = value
-        with open(self._config_file, "w") as file:
-            json.dump(self._config_data, file)
-
-    @staticmethod
-    def get_instance():
-        # Returns the singleton instance of Config
-        if not Config._instance:
-            Config()
-        return Config._instance
+        self._save_config()

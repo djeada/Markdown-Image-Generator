@@ -83,7 +83,7 @@ class DrawDefault:
         print(lines, current_height)
 
         for line in lines:
-            text_width = Config.get_instance().get("PAGE_RIGHT_MARGIN")
+            text_width = Config().get("PAGE_RIGHT_MARGIN")
             start_pos = 0
             for section_start, section_end in highlighted_sections:
                 # Draw the non-highlighted part
@@ -136,8 +136,8 @@ class DrawTitle:
     def __init__(
         self,
         text_color: str,
-        padding_left: int = Config.get_instance().get("PAGE_RIGHT_MARGIN"),
-        padding_top: int = Config.get_instance().get("PAGE_TOP_MARGIN"),
+        padding_left: int = Config().get("PAGE_RIGHT_MARGIN"),
+        padding_top: int = Config().get("PAGE_TOP_MARGIN"),
     ):
         """
         Constructor for the DrawTitle class.
@@ -167,9 +167,10 @@ class DrawTitle:
         :return: A tuple containing the image with the text drawn and the height of the text in pixels.
         """
         d = ImageDraw.Draw(img)
+        current_height += 10
 
         # Wrap the text by two words per line
-        lines = textwrap.wrap(text, width=24, break_long_words=False)
+        lines = textwrap.wrap(text, width=18, break_long_words=False)
 
         # Calculate the total height of the text based on the number of lines and the line height
         line_height = 100  # 150 title # 100 other
@@ -193,91 +194,6 @@ class DrawTitle:
         return img, current_height + text_height + line_height
 
 
-class DrawList:
-    """
-    Drawing strategy for a list of texts with bullet points.
-    """
-
-    def __init__(self, text_color: str, bullet_point="\u2022 "):
-        """
-        Constructor for the DrawList class.
-
-        :param text_color: The color of the text to be drawn.
-        :param bullet_point: The symbol used for the bullet point. Defaults to "\u2022 " (bullet point symbol followed by a space).
-        """
-        self.text_color = text_color
-        self.bullet_point = bullet_point
-
-    def draw(
-        self,
-        img: Image.Image,
-        text: str,
-        font: ImageFont.FreeTypeFont,
-        current_height: int,
-    ) -> Tuple[Image.Image, int]:
-        """
-        Method to draw the text as a list of bullet points on the image and return the image and the new height.
-
-        :param img: The image to draw on.
-        :param text: The text to be drawn, where each line is separated by '\n'.
-        :param font: The font of the text.
-        :param current_height: The current height on the image to start drawing the text.
-        :return: A tuple containing the image with the text drawn and the new height.
-        """
-        d = ImageDraw.Draw(img)
-
-        # Width of the image
-        img_width = img.size[0]
-
-        char_per_line = img_width // Config.get_instance().get("CHAR_WIDTH") - len(
-            self.bullet_point
-        )  # Adjust for the width of the bullet point
-
-        # Calculate the line height based on the size of the string "Ay"
-        line_height = Config.get_instance().get("LIST_LINE_HEIGHT")
-
-        # Split the text into lines and draw each line as a bullet point
-        lines = text.split("\n")
-        n = current_height
-        for line in lines:
-            # Wrap the line
-            wrapped_lines = textwrap.wrap(line, width=char_per_line)
-
-            # Draw each wrapped line of text
-            for i, wrapped_line in enumerate(wrapped_lines):
-                if i == 0:  # If it's the first line of the bullet point
-                    d.text(
-                        (
-                            Config.get_instance().get("PAGE_RIGHT_MARGIN"),
-                            current_height,
-                        ),
-                        self.bullet_point + wrapped_line,
-                        fill=self.text_color,
-                        font=font,
-                    )
-                else:  # If it's a continuation line of the bullet point
-                    d.text(
-                        (
-                            10
-                            + Config.get_instance().get("CHAR_WIDTH")
-                            * len(self.bullet_point),
-                            current_height,
-                        ),
-                        wrapped_line,
-                        fill=self.text_color,
-                        font=font,
-                    )
-
-                # Update the current height for the next line
-                current_height += line_height
-
-            # Add an extra line_height for spacing between bullet points
-            current_height += line_height
-
-        # Return image and the new current height
-        return img, current_height - n + line_height
-
-
 class DrawTable:
     """
     Class that represents a strategy to draw a table on an image using matplotlib.
@@ -289,9 +205,9 @@ class DrawTable:
 
         :param text_color: The color of the text to be drawn.
         """
-        self.scale_factor = Config.get_instance().get("TABLE_SCALE_FACTOR")
-        self.background_color = Config.get_instance().get("TABLE_BG_COLOR")
-        self.text_color = Config.get_instance().get("TABLE_FG_COLOR")
+        self.scale_factor = Config().get("TABLE_SCALE_FACTOR")
+        self.background_color = Config().get("TABLE_BG_COLOR")
+        self.text_color = Config().get("TABLE_FG_COLOR")
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -355,7 +271,7 @@ class DrawTable:
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        wrapping_width = 23  # Adjust this value as needed
+        wrapping_width = 15  # Adjust this value as needed
 
         for (i, j), val in np.ndenumerate(df):
             val = textwrap.fill(str(val), width=wrapping_width)
@@ -368,7 +284,16 @@ class DrawTable:
                 loc="left",
                 facecolor=self.background_color,
             )
-            cell.get_text().set_color(self.text_color)  # set color to blue
+
+            # if re.match(r"\*.*\*$", val):
+            if val.startswith("*") or val.endswith("*"):
+                cell.get_text().set_color("#ffab00")  # Set color to red
+                unwrapped_val = val.replace("*", "")
+                cell.get_text().set_text(
+                    textwrap.fill(unwrapped_val, width=wrapping_width)
+                )
+            else:
+                cell.get_text().set_color(self.text_color)
 
         for i, label in enumerate(df.columns):
             label = textwrap.fill(str(label), width=wrapping_width)
@@ -456,7 +381,7 @@ class DrawCode:
 
         :param lexer_name: The name of the lexer to use for syntax highlighting, e.g., "python".
         """
-        self.scale_factor = Config.get_instance().get("CODE_BLOCK_SCALE_FACTOR")
+        self.scale_factor = Config().get("CODE_BLOCK_SCALE_FACTOR")
 
     def _extract_lexer_name(self, text: str) -> Tuple[str, str]:
         """
@@ -509,7 +434,7 @@ class DrawCode:
 
         draw.rounded_rectangle(
             (0, 0, rounded_rect.width, rounded_rect.height),
-            fill=hex_to_rgba(Config.get_instance().get("CODE_BLOCK_BG")),
+            fill=hex_to_rgba(Config().get("CODE_BLOCK_BG")),
             radius=corner_radius,
         )
 
@@ -580,19 +505,19 @@ class DrawCode:
             lexer,
             ImageFormatter(style=get_style_by_name("vim"), line_numbers=False),
         )
-
+        current_height += 10
         code_img = Image.open(BytesIO(highlighted_code))
         code_img = self._ensure_alpha_channel(code_img)
 
         rounded_rect = self._create_rounded_rect(
             code_img.width,
-            code_img.height + Config.get_instance().get("CODE_BLOCK_TOP_PADDING"),
-            Config.get_instance().get("CODE_BLOCK_RADIUS"),
-            Config.get_instance().get("CODE_BLOCK_RADIUS"),
+            code_img.height + Config().get("CODE_BLOCK_TOP_PADDING"),
+            Config().get("CODE_BLOCK_RADIUS"),
+            Config().get("CODE_BLOCK_RADIUS"),
         )
         rounded_rect.paste(
             code_img,
-            (10, 10 + Config.get_instance().get("CODE_BLOCK_TOP_PADDING")),
+            (10, 10 + Config().get("CODE_BLOCK_TOP_PADDING")),
             code_img,
         )  # 10 is the padding
 

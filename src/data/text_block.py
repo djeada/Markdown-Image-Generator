@@ -1,34 +1,42 @@
+from typing import List, Optional
+
+
 class TextBlock:
     """
     A class representing a block of text.
 
     Attributes
-    -------
+    ----------
     type : str
-        The type of text block (header, paragraph, list, code, etc.)
+        The type of the text block (e.g., 'header', 'paragraph', 'list', 'code').
     data : str
         The text content of the block.
     children : List[TextBlock]
-        Any child text blocks of this block.
+        A list of child text blocks.
+
+    Methods
+    -------
+    add_child(child: TextBlock) -> None:
+        Adds a child text block to this block.
     """
 
-    def __init__(self, type: str, data: str, children=None):
+    def __init__(
+        self, type: str, data: str, children: Optional[List["TextBlock"]] = None
+    ):
         self.type = type
         self.data = data
         self.children = children if children is not None else []
 
-    def add_child(self, child):
+    def add_child(self, child: "TextBlock") -> None:
+        """Adds a child text block to this block."""
         self.children.append(child)
 
-    def __repr__(self):
-        children_str = ", ".join(str(child) for child in self.children)
-        return f"Type: {self.type}, Data: {self.data}, Children: [{children_str}]"
+    def __repr__(self) -> str:
+        return f"TextBlock(type={self.type!r}, data={self.data!r}, children={self.children!r})"
 
-    def __eq__(self, other):
-        if isinstance(other, TextBlock):
-            return (
-                self.type == other.type
-                and self.data == other.data
-                and self.children == other.children
-            )
-        return False
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, TextBlock) and (
+            self.type,
+            self.data,
+            self.children,
+        ) == (other.type, other.data, other.children)
