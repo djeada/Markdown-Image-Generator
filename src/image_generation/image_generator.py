@@ -35,7 +35,6 @@ class ImageGenerator:
         self.height = Config().get("IMAGE_HEIGHT")
         self.bg_color = Config().get("BG_COLOR")
         self.text_color = Config().get("TEXT_COLOR")
-        self.start_index = Config().get("START_INDEX")
         self.font_path = font_path
         self.block_styles = self.initialize_block_styles()
 
@@ -72,10 +71,12 @@ class ImageGenerator:
 
     def draw_page_number(self, image: Image, page_num: int) -> None:
         # Define a position and style for the page number and draw it
-        position = (self.width - 165, 130)
+        position = (self.width - 170, 120)
         draw = ImageDraw.Draw(image)
         page_num_str = (
-            f"?" if Config().get("CHALLENGE") else f"{page_num + self.start_index}"
+            f"?"
+            if Config().get("CHALLENGE")
+            else f'{page_num +Config().get("START_INDEX")}'
         )
         font_color = Config().get("PAGE_NUMBER_FONT_COLOR")
         font = self.get_font_for_block(BlockType.HEADER)
@@ -83,31 +84,19 @@ class ImageGenerator:
             draw.text(position, page_num_str, fill=font_color, font=font)
 
     def generate_images(self, blocks: List[TextBlock]):
-        TOP_MARGIN = Config().get("PAGE_TOP_MARGIN")
         images = [self.create_new_image()]
-        current_height = TOP_MARGIN
+        current_height = Config().get("PAGE_TOP_MARGIN")
         current_page = 1  # start with page 1
-        last_block_type = None  # To store the last block's type
 
         for idx, block in enumerate(blocks):
             img = images[-1]
 
-            # Check if the block can fit on the current image
-            # if current_height + block_height + TOP_MARGIN > self.height + 1111:
-            if block.type != "title":  # Check the last block type here
-                # Finalize the page number on the previous page before creating a new page
+            if block.type != "title":
                 self.draw_page_number(img, current_page)
 
             # Now draw the block on the appropriate image
             block_height = self.draw_text_on_image(img, block, current_height)
             current_height = block_height
-            last_block_type = (
-                block.type
-            )  # Update the last block type at the end of loop
-
-        if last_block_type != "title":  # Check the last block type here
-            # Draw the page number on the last page
-            self.draw_page_number(images[-1], current_page)
 
         return images
 

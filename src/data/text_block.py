@@ -35,8 +35,12 @@ class TextBlock:
         return f"TextBlock(type={self.type!r}, data={self.data!r}, children={self.children!r})"
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, TextBlock) and (
-            self.type,
-            self.data,
-            self.children,
-        ) == (other.type, other.data, other.children)
+        return (
+            isinstance(other, TextBlock)
+            and (
+                self.type,
+                self.data,
+                self.children,
+            )
+            == (other.type, other.data, other.children)
+        )

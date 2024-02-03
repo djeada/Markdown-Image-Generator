@@ -60,6 +60,7 @@ class CodeBlockParser(BlockParser):
         super().__init__()
         self.is_parsing = False
         self.content = []
+        self.counter = 0
 
     def is_start_line(self, line: str) -> bool:
         stripped_line = line.strip()
@@ -70,10 +71,14 @@ class CodeBlockParser(BlockParser):
 
     def is_end_line(self, line: str) -> bool:
         stripped_line = line.strip()
-        if self.is_parsing and stripped_line == "```":
-            self.content.append(stripped_line)
-            self.is_parsing = False
-            return True
+        if stripped_line == "```":
+            if self.counter:
+                self.content.append(stripped_line)
+                self.is_parsing = False
+                self.counter = 0
+                return True
+            else:
+                self.counter += 1
         return False
 
     def parse(self, line: str):

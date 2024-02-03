@@ -481,7 +481,6 @@ class DrawCode:
         x_position = (img.width - scaled_rounded_rect_width) // 2
 
         scaled_rounded_rect_height = int(rounded_rect.height * self.scale_factor)
-        height_difference = (rounded_rect.height - scaled_rounded_rect_height) // 2
 
         scaled_rounded_rect = rounded_rect.resize(
             (scaled_rounded_rect_width, scaled_rounded_rect_height)

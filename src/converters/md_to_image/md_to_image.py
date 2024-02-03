@@ -49,7 +49,7 @@ class MarkdownToImageConverter:
         Interpret markdown content for text blocks.
         """
         md_interpreter = self.md_to_title if is_title else self.md_to_text
-        return md_interpreter.interpret(content)
+        return md_interpreter.run(content)
 
     def handle_output(self, images: List[str]) -> None:
         """

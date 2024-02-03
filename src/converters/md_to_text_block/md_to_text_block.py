@@ -15,32 +15,16 @@ from src.data.text_block import TextBlock
 class MarkdownToTextBlock:
     """
     A class to interpret Markdown into text blocks.
-
-    Attributes:
-        is_title (bool): Indicates if the content is a title.
-        parser (SectionParser): Parser for markdown sections.
-        parsers (List[BlockParser]): List of block-level parsers.
-
-    Methods:
-        interpret(content: str, max_width: int) -> List[List[TextBlock]]:
-            Interprets markdown content into text blocks.
     """
 
-    def __init__(
-        self, is_title: bool = False, parsers: Optional[List[BlockParser]] = None
-    ):
+    def __init__(self, is_title: bool = False):
         self.is_title = is_title
         self.parser = SectionParser()
-        self.parsers = (
-            parsers
-            if parsers
-            else [CodeBlockParser(), TableBlockParser(), HeaderParser()]
-        )
+        self.parsers = [CodeBlockParser(), TableBlockParser(), HeaderParser()]
+
         self.active_parser = None
 
-    def interpret(
-        self, content: str, max_width: int = sys.maxsize
-    ) -> List[List[TextBlock]]:
+    def run(self, content: str, max_width: int = sys.maxsize) -> List[List[TextBlock]]:
         if self.is_title:
             return [[TextBlock("title", content)]]
 
@@ -71,6 +55,7 @@ class MarkdownToTextBlock:
                     return parser
         return self.active_parser
 
-    def _wrap_line(self, line: str, max_width: int) -> List[TextBlock]:
+    @staticmethod
+    def _wrap_line(line: str, max_width: int) -> List[TextBlock]:
         wrapped_lines = textwrap.wrap(line, width=max_width)
         return [TextBlock("paragraph", wl) for wl in wrapped_lines]
