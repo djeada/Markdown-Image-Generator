@@ -44,10 +44,9 @@ class DrawStrategy(ABC):
 
 
 class DrawDefault:
-    CHAR_WIDTH = 10  # Example character width, adjust as needed
-    LINE_HEIGHT = 50  # Example line height, adjust as needed
-
-    def __init__(self, text_color: str, highlight_color: str = "#ffab00"):
+    def __init__(
+        self, text_color: str, highlight_color: str = "#ffab00", is_title=False
+    ):
         self.text_color = text_color
         self.highlight_color = highlight_color
 
@@ -71,13 +70,12 @@ class DrawDefault:
     ) -> Tuple[Image.Image, int]:
 
         if text.strip()[0].isdigit():
-            current_height += DrawDefault.LINE_HEIGHT
-
+            current_height += font.font.height * 1.5
         d = ImageDraw.Draw(img)
         img_width = img.size[0]
 
-        char_per_line = img_width // DrawDefault.CHAR_WIDTH
-        lines = textwrap.wrap(text, width=char_per_line)
+        char_per_line = img_width // font.getbbox("a")[2]
+        lines = textwrap.wrap(text, width=char_per_line, break_long_words=False)
 
         highlighted_sections = self.find_highlighted_sections(text)
         print(lines, current_height)
@@ -87,7 +85,7 @@ class DrawDefault:
             start_pos = 0
             for section_start, section_end in highlighted_sections:
                 # Draw the non-highlighted part
-                before_highlight = text[start_pos:section_start]
+                before_highlight = line[start_pos:section_start]
                 if before_highlight:
                     d.text(
                         (text_width, current_height),
@@ -99,9 +97,9 @@ class DrawDefault:
                 start_pos = section_end + 1
 
                 # Draw the highlighted part
-                if section_start < len(text) and section_end < len(text):
-                    text_width += DrawDefault.CHAR_WIDTH
-                    highlight_text = text[
+                if section_start < len(line) and section_end < len(line):
+                    text_width += font.getbbox("a")[2]
+                    highlight_text = line[
                         section_start + 1 : section_end
                     ]  # Exclude asterisks
                     d.text(
@@ -112,7 +110,7 @@ class DrawDefault:
                     )
                     text_width += font.getmask(highlight_text).getbbox()[2]
             # Draw the remaining part of the line, if any
-            remaining_text = text[start_pos:]
+            remaining_text = line[start_pos:]
             if remaining_text:
                 d.text(
                     (text_width, current_height),
@@ -122,76 +120,9 @@ class DrawDefault:
                 )
 
             # Move to the next line
-            current_height += DrawDefault.LINE_HEIGHT
+            current_height += font.font.height * 1.5
 
         return img, current_height
-
-
-class DrawTitle:
-    """
-    Title drawing strategy.
-    Ensures there are a maximum of 2 title words per line.
-    """
-
-    def __init__(
-        self,
-        text_color: str,
-        padding_left: int = Config().get("PAGE_RIGHT_MARGIN"),
-        padding_top: int = Config().get("PAGE_TOP_MARGIN"),
-    ):
-        """
-        Constructor for the DrawTitle class.
-
-        :param text_color: The color of the text to be drawn.
-        :param padding_left: The horizontal padding from the left edge.
-        :param padding_top: The vertical padding from the top edge.
-        """
-        self.text_color = text_color
-        self.padding_left = padding_left
-        self.padding_top = padding_top
-
-    def draw(
-        self,
-        img: Image.Image,
-        text: str,
-        font: ImageFont.FreeTypeFont,
-        current_height: int,
-    ) -> Tuple[Image.Image, int]:
-        """
-        Method to draw the text on the image and return the image and the height of the text.
-
-        :param img: The image to draw on.
-        :param text: The text to be drawn.
-        :param font: The font of the text.
-        :param current_height: The current height on the image to draw the text.
-        :return: A tuple containing the image with the text drawn and the height of the text in pixels.
-        """
-        d = ImageDraw.Draw(img)
-        current_height += 10
-
-        # Wrap the text by two words per line
-        lines = textwrap.wrap(text, width=18, break_long_words=False)
-
-        # Calculate the total height of the text based on the number of lines and the line height
-        line_height = 100  # 150 title # 100 other
-        text_height = len(lines) * line_height
-
-        # Draw each line of text
-        for i, line in enumerate(lines):
-            width = 1000
-            x_pos = (
-                img.width - width
-            ) // 2 + self.padding_left  # Center the text horizontally considering padding
-            y_pos = self.padding_top + current_height + i * line_height
-            d.text(
-                (x_pos, y_pos),
-                line,
-                fill=self.text_color,
-                font=font,
-            )
-
-        # Return image and the new current height
-        return img, current_height + text_height + line_height
 
 
 class DrawTable:
@@ -522,4 +453,4 @@ class DrawCode:
 
         img, height = self._paste_onto_image(img, rounded_rect, current_height)
 
-        return img, 790
+        return img, height

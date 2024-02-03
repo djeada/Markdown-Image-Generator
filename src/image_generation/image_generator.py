@@ -8,7 +8,6 @@ from src.image_generation.draw_strategy import (
     DrawDefault,
     DrawTable,
     DrawCode,
-    DrawTitle,
 )
 from src.utils.config import Config
 
@@ -133,7 +132,7 @@ class ImageGenerator:
             BlockType.TABLE: DrawTable(self.text_color),
             BlockType.CODE: DrawCode(),
             BlockType.BULLET: DrawDefault(self.text_color),
-            BlockType.TITLE: DrawTitle(self.text_color),
+            BlockType.TITLE: DrawDefault(self.text_color, is_title=True),
         }
         strategy = strategies.get(
             BlockType[block.type.upper()], strategies[BlockType.PARAGRAPH]

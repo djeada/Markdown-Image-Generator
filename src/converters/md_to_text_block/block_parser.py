@@ -71,7 +71,7 @@ class CodeBlockParser(BlockParser):
 
     def is_end_line(self, line: str) -> bool:
         stripped_line = line.strip()
-        if stripped_line == "```":
+        if stripped_line.startswith("```"):
             if self.counter:
                 self.content.append(stripped_line)
                 self.is_parsing = False
