@@ -100,7 +100,7 @@ After installation, you can start using the Markdown Image Generator to convert 
 2. **Run the Generator**: Use the following command to generate images from your Markdown file:
 
 ```bash
-python markdown_image_generator.py yourfile.md
+python main.py yourfile.md
 ```
 
 Replace `yourfile.md` with the path to your Markdown file.
