@@ -59,6 +59,53 @@ Is adeptly transformed into an image like this:
 
 ![tmpqa7jtwlt](https://github.com/djeada/Markdown-Image-Generator/assets/37275728/f0bf1aa4-d9ff-4561-ac19-2ba2cede88fd)
 
+## Installation
+
+To get started with the Markdown Image Generator, follow these simple steps:
+
+### Prerequisites
+
+Ensure you have the following prerequisites installed:
+- Python 3.9 or newer
+- pip (Python package installer)
+
+### Step-by-Step Installation
+
+1. **Clone the Repository**: First, clone the repository to your local machine using Git:
+
+```bash
+git clone https://github.com/djeada/Markdown-Image-Generator.git
+```
+
+2. **Navigate to the Project Directory**: Change into the project directory:
+
+```bash
+cd Markdown-Image-Generator
+```
+
+3. **Install Dependencies**: Install the required Python packages using pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+After installation, you can start using the Markdown Image Generator to convert your Markdown files into images.
+
+### Basic Usage
+
+1. **Prepare Your Markdown File**: Write your Markdown content in a .md file.
+
+2. **Run the Generator**: Use the following command to generate images from your Markdown file:
+
+```bash
+python markdown_image_generator.py yourfile.md
+```
+
+Replace `yourfile.md` with the path to your Markdown file.
+
+
 ## How to Contribute
 
 Your contributions are invaluable to the project! If you're interested in making improvements:
