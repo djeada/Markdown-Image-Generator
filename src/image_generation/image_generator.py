@@ -63,10 +63,8 @@ class ImageGenerator:
         # Define a position and style for the page number and draw it
         position = (self.width - 170, 120)
         draw = ImageDraw.Draw(image)
-        page_num_str = (
-            f"?" if Config()["CHALLENGE"] else f'{page_num + Config()["START_INDEX"]}'
-        )
-        font_color = Config()["PAGE_NUMBER_FONT_COLOR"]
+        page_num_str =  f'{page_num + Config()["PAGE_LAYOUT"]["START_INDEX"]}'
+        font_color = Config()["COLORS"]["PAGE_NUMBER_FONT"]
         font = self.get_font_for_block(BlockType.HEADER)
         if font:
             draw.text(position, page_num_str, fill=font_color, font=font)
@@ -76,8 +74,10 @@ class ImageGenerator:
         current_height = Config()["PAGE_LAYOUT"]["TOP_MARGIN"]
         current_page = 1  # start with page 1
 
+        img = None
         for idx, block in enumerate(blocks):
-            img = BlockImageFactory.create_background_image(
+            if img == None:
+                img = BlockImageFactory.create_background_image(
                 block.type,
                 Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
                 Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"],
@@ -90,6 +90,10 @@ class ImageGenerator:
             block_height = self.draw_text_on_image(img, block, current_height)
             current_height = block_height
 
+            if current_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]* 0.8:
+                images.append(img)
+                img = None
+        if img is not None:
             images.append(img)
 
         return images
