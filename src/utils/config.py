@@ -17,7 +17,6 @@ def singleton(cls):
 @singleton
 class Config:
     _config_file = Path("config.json")
-
     # Default configuration values
     _default_values = {
         "DEFAULT_PAGE_PATH": "../resources/page.png",
@@ -49,7 +48,8 @@ class Config:
         self._config_data: Dict[str, Any] = {}
         self.init_config()
 
-    def init_config(self) -> None:
+    def init_config(self, path: Path = None) -> None:
+        self._config_file = path if path is not None else Path("config.json")
         if not self._config_file.exists():
             self._save_defaults()
         self._load_config()
