@@ -2,6 +2,27 @@
 
 The Markdown Image Generator is a Python-based project that transforms Markdown documents into a series of images. It aims to provide a unique way to visualize Markdown content, especially useful for presentations, sharing over image-based platforms, or even for educational purposes.
 
+## System Diagram
+
+```
++-------------+       +------------------+       +----------------+       +---------------------+
+|             |       |                  |       |                |       |                     |
+| Markdown    +------>+ Markdown Reader  +------>+ Converters     +------>+ Image Generation    |
+| File (.md)  |       | (input_output)   |       | (converters)   |       | (image_generation)  |
+|             |       |                  |       |                |       |                     |
++-------------+       +------------------+       +----------------+       +---------------------+
+                                                         |       
+                                                         |       
+                                                         |       
+                                                         v       
+                                                 +----------------+       +---------------+
+                                                 |                |       |               |
+                                                 | Data Handling  +------>+ Image Saver   |
+                                                 | (data)         |       | (input_output)|
+                                                 |                |       |               |
+                                                 +----------------+       +---------------+
+```
+
 ## Features
 
 - Parses different types of Markdown elements like headers, paragraphs, bullet lists, tables and code blocks.
