@@ -80,7 +80,7 @@ class DrawDefault:
         highlighted_sections = self.find_highlighted_sections(text)
         print(lines, current_height)
 
-        for line in lines:
+        for i, line in enumerate(lines):
             text_width = Config().get("PAGE_RIGHT_MARGIN")
             start_pos = 0
             for section_start, section_end in highlighted_sections:
@@ -192,7 +192,7 @@ class DrawTable:
         """
         img_width = 0.9 * img_width
         fig_width = img_width / 80  # Convert pixel to inches, assuming 80 dpi
-        fig_height = 8  # Adjust this value as needed
+        fig_height = 6.5  # Adjust this value as needed
 
         # Set transparent background with the facecolor parameter
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="none")
@@ -202,7 +202,7 @@ class DrawTable:
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        wrapping_width = 15  # Adjust this value as needed
+        wrapping_width = 25  # Adjust this value as needed
 
         for (i, j), val in np.ndenumerate(df):
             val = textwrap.fill(str(val), width=wrapping_width)

@@ -28,7 +28,7 @@ class BlockParser(ABC):
         pass
 
 
-class HeaderParser(BlockParser):
+class TitleParser(BlockParser):
     def __init__(self):
         super().__init__()
         self.content = ""
@@ -47,12 +47,23 @@ class HeaderParser(BlockParser):
         return False
 
     def get_block(self) -> TextBlock:
-        block = TextBlock("header", self.content)
+        block = TextBlock("title", self.content)
         self.content = ""
         return block
 
     def reset(self):
         self.content = []
+
+
+class HeaderParser(TitleParser):
+    def is_start_line(self, line: str) -> bool:
+        stripped_line = line.strip()
+        return stripped_line.startswith("##")
+
+    def get_block(self) -> TextBlock:
+        block = TextBlock("header", self.content)
+        self.content = ""
+        return block
 
 
 class CodeBlockParser(BlockParser):

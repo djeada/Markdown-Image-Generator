@@ -1,4 +1,14 @@
+from enum import Enum, auto
 from typing import List, Optional
+
+
+class BlockType(Enum):
+    PARAGRAPH = auto()
+    HEADER = auto()
+    TABLE = auto()
+    CODE = auto()
+    BULLET = auto()
+    TITLE = auto()
 
 
 class TextBlock:

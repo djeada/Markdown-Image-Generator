@@ -1,9 +1,11 @@
 import logging
 from typing import List, Dict, Optional
 from PIL import Image, ImageFont, ImageDraw
-from enum import Enum, auto
 
-from src.data.text_block import TextBlock
+from src.converters.block_to_background_image.block_image_factory import (
+    BlockImageFactory,
+)
+from src.data.text_block import TextBlock, BlockType
 from src.image_generation.draw_strategy import (
     DrawDefault,
     DrawTable,
@@ -14,22 +16,12 @@ from src.utils.config import Config
 logger = logging.getLogger(__name__)
 
 
-class BlockType(Enum):
-    PARAGRAPH = auto()
-    HEADER = auto()
-    TABLE = auto()
-    CODE = auto()
-    BULLET = auto()
-    TITLE = auto()
-
-
 class ImageGenerator:
     def __init__(
         self,
         bg_image: Optional[str] = None,
         font_path: str = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
     ):
-        self.bg_image = bg_image
         self.width = Config().get("IMAGE_WIDTH")
         self.height = Config().get("IMAGE_HEIGHT")
         self.bg_color = Config().get("BG_COLOR")
@@ -83,12 +75,14 @@ class ImageGenerator:
             draw.text(position, page_num_str, fill=font_color, font=font)
 
     def generate_images(self, blocks: List[TextBlock]):
-        images = [self.create_new_image()]
+        images = []
         current_height = Config().get("PAGE_TOP_MARGIN")
         current_page = 1  # start with page 1
 
         for idx, block in enumerate(blocks):
-            img = images[-1]
+            img = BlockImageFactory.create_background_image(
+                block.type, Config().get("IMAGE_WIDTH"), Config().get("IMAGE_HEIGHT")
+            )
 
             if block.type != "title":
                 self.draw_page_number(img, current_page)
@@ -97,13 +91,9 @@ class ImageGenerator:
             block_height = self.draw_text_on_image(img, block, current_height)
             current_height = block_height
 
-        return images
+            images.append(img)
 
-    def create_new_image(self) -> Image:
-        if self.bg_image:
-            return Image.open(self.bg_image).resize((self.width, self.height))
-        else:
-            return Image.new("RGB", (self.width, self.height), color=self.bg_color)
+        return images
 
     def get_font_for_block(
         self, block_type: BlockType

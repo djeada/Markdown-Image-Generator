@@ -20,6 +20,10 @@ class Config:
 
     # Default configuration values
     _default_values = {
+        "DEFAULT_PAGE_PATH": "../resources/page.png",
+        "TITLE_PAGE_PATH": "../resources/intro.png",
+        "FINAL_PAGE_PATH": "../resources/final.png",
+        "QUESTION_PAGE_PATH": "../resources/challenge.png",
         "PAGE_TOP_MARGIN": 250,
         "PAGE_RIGHT_MARGIN": 80,
         "PAGE_NUMBER_FONT_COLOR": "#292929",
@@ -49,7 +53,6 @@ class Config:
         if not self._config_file.exists():
             self._save_defaults()
         self._load_config()
-        self._ensure_defaults()
 
     def _load_config(self) -> None:
         try:
@@ -62,15 +65,6 @@ class Config:
     def _save_defaults(self) -> None:
         with self._config_file.open("w") as file:
             json.dump(self._default_values, file, indent=4)
-
-    def _ensure_defaults(self) -> None:
-        defaults_added = False
-        for key, value in self._default_values.items():
-            if key not in self._config_data:
-                self._config_data[key] = value
-                defaults_added = True
-        if defaults_added:
-            self._save_config()
 
     def _save_config(self) -> None:
         with self._config_file.open("w") as file:

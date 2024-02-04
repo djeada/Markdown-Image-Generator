@@ -7,6 +7,7 @@ from src.converters.md_to_text_block.block_parser import (
     CodeBlockParser,
     TableBlockParser,
     HeaderParser,
+    TitleParser,
 )
 from src.converters.md_to_text_block.sections_parser import SectionParser
 from src.data.text_block import TextBlock
@@ -17,17 +18,18 @@ class MarkdownToTextBlock:
     A class to interpret Markdown into text blocks.
     """
 
-    def __init__(self, is_title: bool = False):
-        self.is_title = is_title
+    def __init__(self):
         self.parser = SectionParser()
-        self.parsers = [CodeBlockParser(), TableBlockParser(), HeaderParser()]
+        self.parsers = [
+            CodeBlockParser(),
+            TableBlockParser(),
+            HeaderParser(),
+            TitleParser(),
+        ]
 
         self.active_parser = None
 
     def run(self, content: str, max_width: int = sys.maxsize) -> List[List[TextBlock]]:
-        if self.is_title:
-            return [[TextBlock("title", content)]]
-
         sections = self.parser.parse(content)
         return [self._parse_section(section, max_width) for section in sections]
 
