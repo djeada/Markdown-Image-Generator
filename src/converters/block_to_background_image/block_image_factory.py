@@ -7,10 +7,10 @@ class BlockImageFactory:
     _config = Config()
 
     PATHS_TO_IMAGES = {
-        BackgroundImageType.TITLE: _config.get("TITLE_PAGE_PATH"),
-        BackgroundImageType.NORMAL: _config.get("DEFAULT_PAGE_PATH"),
-        BackgroundImageType.FINAL: _config.get("FINAL_PAGE_PATH"),
-        BackgroundImageType.QUESTION: _config.get("QUESTION_PAGE_PATH"),
+        BackgroundImageType.TITLE: _config["PATHS"]["TITLE_PAGE"],
+        BackgroundImageType.NORMAL: _config["PATHS"]["DEFAULT_PAGE"],
+        BackgroundImageType.FINAL: _config["PATHS"]["FINAL_PAGE"],
+        BackgroundImageType.QUESTION: _config["PATHS"]["QUESTION_PAGE"],
     }
 
     @classmethod

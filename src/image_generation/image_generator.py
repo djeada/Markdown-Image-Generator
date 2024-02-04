@@ -22,16 +22,15 @@ class ImageGenerator:
         bg_image: Optional[str] = None,
         font_path: str = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
     ):
-        self.width = Config().get("IMAGE_WIDTH")
-        self.height = Config().get("IMAGE_HEIGHT")
-        self.bg_color = Config().get("BG_COLOR")
-        self.text_color = Config().get("TEXT_COLOR")
+        self.width = Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"]
+        self.height = Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]
+        self.bg_color = Config()["COLORS"]["BACKGROUND"]
+        self.text_color = Config()["COLORS"]["TEXT"]
         self.font_path = font_path
         self.block_styles = self.initialize_block_styles()
 
     def initialize_block_styles(self) -> Dict[BlockType, Dict]:
         height = self.height
-        challenge_mode = Config().get("CHALLENGE")
         return {
             BlockType.TITLE: {
                 "font_size": height // 12,
@@ -42,8 +41,8 @@ class ImageGenerator:
                 "line_height": height // 18,
             },
             BlockType.PARAGRAPH: {
-                "font_size": height // 35 if challenge_mode else height // 40,
-                "line_height": height // 25 if challenge_mode else height // 30,
+                "font_size": height // 40,
+                "line_height": height // 30,
             },
             BlockType.TABLE: {
                 "font_size": height // 30,
@@ -65,23 +64,23 @@ class ImageGenerator:
         position = (self.width - 170, 120)
         draw = ImageDraw.Draw(image)
         page_num_str = (
-            f"?"
-            if Config().get("CHALLENGE")
-            else f'{page_num +Config().get("START_INDEX")}'
+            f"?" if Config()["CHALLENGE"] else f'{page_num + Config()["START_INDEX"]}'
         )
-        font_color = Config().get("PAGE_NUMBER_FONT_COLOR")
+        font_color = Config()["PAGE_NUMBER_FONT_COLOR"]
         font = self.get_font_for_block(BlockType.HEADER)
         if font:
             draw.text(position, page_num_str, fill=font_color, font=font)
 
     def generate_images(self, blocks: List[TextBlock]):
         images = []
-        current_height = Config().get("PAGE_TOP_MARGIN")
+        current_height = Config()["PAGE_LAYOUT"]["TOP_MARGIN"]
         current_page = 1  # start with page 1
 
         for idx, block in enumerate(blocks):
             img = BlockImageFactory.create_background_image(
-                block.type, Config().get("IMAGE_WIDTH"), Config().get("IMAGE_HEIGHT")
+                block.type,
+                Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
+                Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"],
             )
 
             if block.type != "title":

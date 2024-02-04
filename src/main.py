@@ -22,8 +22,8 @@ class CommandLineInterface:
             "--output",
             dest="output_directory",
             help="The directory where the output images will be saved. "
-                 "If not provided, images will be displayed on the screen, "
-                 "but not saved.",
+            "If not provided, images will be displayed on the screen, "
+            "but not saved.",
             required=False,
         )
         parser.add_argument(

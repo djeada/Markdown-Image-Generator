@@ -19,29 +19,38 @@ class Config:
     _config_file = Path("config.json")
     # Default configuration values
     _default_values = {
-        "DEFAULT_PAGE_PATH": "../resources/page.png",
-        "TITLE_PAGE_PATH": "../resources/intro.png",
-        "FINAL_PAGE_PATH": "../resources/final.png",
-        "QUESTION_PAGE_PATH": "../resources/challenge.png",
-        "PAGE_TOP_MARGIN": 250,
-        "PAGE_RIGHT_MARGIN": 80,
-        "PAGE_NUMBER_FONT_COLOR": "#292929",
-        "TEXT_COLOR": "#FFFFFF",
-        "BG_COLOR": "#000000",
-        "IMAGE_WIDTH": 1080,
-        "IMAGE_HEIGHT": 1080,
-        "CHAR_WIDTH": 15,
-        "DEFAULT_LINE_HEIGHT": 30,
-        "LIST_LINE_HEIGHT": 20,
-        "TABLE_SCALE_FACTOR": 1,
-        "CODE_BLOCK_SCALE_FACTOR": 2,
-        "CODE_BLOCK_BG": "#000000",
-        "CODE_BLOCK_RADIUS": 20,
-        "CODE_BLOCK_TOP_PADDING": 50,
-        "START_INDEX": 0,
-        "TABLE_FG_COLOR": "#FFFFFF",
-        "TABLE_BG_COLOR": "#292929",
-        # Add more default values as needed
+        "PATHS": {
+            "DEFAULT_PAGE": "../resources/page.png",
+            "TITLE_PAGE": "../resources/intro.png",
+            "FINAL_PAGE": "../resources/final.png",
+            "QUESTION_PAGE": "../resources/challenge.png",
+        },
+        "PAGE_LAYOUT": {
+            "TOP_MARGIN": 250,
+            "RIGHT_MARGIN": 80,
+            "IMAGE_WIDTH": 1080,
+            "IMAGE_HEIGHT": 1080,
+            "CHAR_WIDTH": 15,
+            "DEFAULT_LINE_HEIGHT": 30,
+            "LIST_LINE_HEIGHT": 20,
+            "START_INDEX": 0,
+        },
+        "COLORS": {
+            "PAGE_NUMBER_FONT": "#292929",
+            "TEXT": "#FFFFFF",
+            "BACKGROUND": "#000000",
+        },
+        "CODE_BLOCK": {
+            "SCALE_FACTOR": 2,
+            "BACKGROUND": "#000000",
+            "RADIUS": 20,
+            "TOP_PADDING": 50,
+        },
+        "TABLE": {
+            "SCALE_FACTOR": 1,
+            "FOREGROUND": "#FFFFFF",
+            "BACKGROUND": "#292929",
+        },
     }
 
     def __init__(self):
@@ -76,3 +85,23 @@ class Config:
     def set(self, key: str, value: Any) -> None:
         self._config_data[key] = value
         self._save_config()
+
+    def __getitem__(self, key):
+        try:
+            return self._config_data[key]
+        except KeyError:
+            raise KeyError(f"Key '{key}' not found in configuration data.")
+
+    def __setitem__(self, key, value):
+        self._config_data[key] = value
+        self._save_config()
+
+    def __contains__(self, key):
+        return key in self._config_data
+
+    def __delitem__(self, key):
+        del self._config_data[key]
+        self._save_config()
+
+    def __iter__(self):
+        return iter(self._config_data)

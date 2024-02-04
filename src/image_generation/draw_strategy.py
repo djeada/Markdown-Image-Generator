@@ -81,7 +81,7 @@ class DrawDefault:
         print(lines, current_height)
 
         for i, line in enumerate(lines):
-            text_width = Config().get("PAGE_RIGHT_MARGIN")
+            text_width = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
             start_pos = 0
             for section_start, section_end in highlighted_sections:
                 # Draw the non-highlighted part
@@ -136,9 +136,9 @@ class DrawTable:
 
         :param text_color: The color of the text to be drawn.
         """
-        self.scale_factor = Config().get("TABLE_SCALE_FACTOR")
-        self.background_color = Config().get("TABLE_BG_COLOR")
-        self.text_color = Config().get("TABLE_FG_COLOR")
+        self.scale_factor = Config()["TABLE"]["SCALE_FACTOR"]
+        self.background_color = Config()["TABLE"]["BACKGROUND"]
+        self.text_color = Config()["TABLE"]["FOREGROUND"]
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -312,7 +312,7 @@ class DrawCode:
 
         :param lexer_name: The name of the lexer to use for syntax highlighting, e.g., "python".
         """
-        self.scale_factor = Config().get("CODE_BLOCK_SCALE_FACTOR")
+        self.scale_factor = Config()["CODE_BLOCK"]["SCALE_FACTOR"]
 
     def _extract_lexer_name(self, text: str) -> Tuple[str, str]:
         """
@@ -441,13 +441,13 @@ class DrawCode:
 
         rounded_rect = self._create_rounded_rect(
             code_img.width,
-            code_img.height + Config().get("CODE_BLOCK_TOP_PADDING"),
-            Config().get("CODE_BLOCK_RADIUS"),
-            Config().get("CODE_BLOCK_RADIUS"),
+            code_img.height + Config()["CODE_BLOCK_TOP_PADDING"],
+            Config()["CODE_BLOCK_RADIUS"],
+            Config()["CODE_BLOCK_RADIUS"],
         )
         rounded_rect.paste(
             code_img,
-            (10, 10 + Config().get("CODE_BLOCK_TOP_PADDING")),
+            (10, 10 + Config()["CODE_BLOCK_TOP_PADDING"]),
             code_img,
         )  # 10 is the padding
 
