@@ -24,6 +24,7 @@ class Config:
             "TITLE_PAGE": "../resources/intro.png",
             "FINAL_PAGE": "../resources/final.png",
             "QUESTION_PAGE": "../resources/challenge.png",
+            "FONT": "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
         },
         "PAGE_LAYOUT": {
             "TOP_MARGIN": 250,

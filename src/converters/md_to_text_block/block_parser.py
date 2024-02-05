@@ -109,25 +109,6 @@ class CodeBlockParser(BlockParser):
         self.content = []
 
 
-class BulletListBlockParser(BlockParser):
-    def is_start_line(self, line: str) -> bool:
-        line = line.strip()
-        return line.startswith("* ") or line.startswith("- ")
-
-    def is_end_line(self, line: str) -> bool:
-        line = line.strip()
-        return not self.is_start_line(line)
-
-    def parse(self, line: str):
-        self.content.append(line.strip()[2:])
-
-    def get_block(self) -> TextBlock:
-        return TextBlock("bullet", "\n".join(self.content))
-
-    def reset(self):
-        self.content = []
-
-
 class TableBlockParser(BlockParser):
     def is_start_line(self, line: str) -> bool:
         line = line.strip()

@@ -17,16 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class ImageGenerator:
-    def __init__(
-        self,
-        bg_image: Optional[str] = None,
-        font_path: str = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
-    ):
+    def __init__(self):
         self.width = Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"]
         self.height = Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]
-        self.bg_color = Config()["COLORS"]["BACKGROUND"]
         self.text_color = Config()["COLORS"]["TEXT"]
-        self.font_path = font_path
+        self.font_path = Config()["PATHS"]["FONT"]
+
         self.block_styles = self.initialize_block_styles()
 
     def initialize_block_styles(self) -> Dict[BlockType, Dict]:
@@ -63,7 +59,7 @@ class ImageGenerator:
         # Define a position and style for the page number and draw it
         position = (self.width - 170, 120)
         draw = ImageDraw.Draw(image)
-        page_num_str =  f'{page_num + Config()["PAGE_LAYOUT"]["START_INDEX"]}'
+        page_num_str = f'{page_num + Config()["PAGE_LAYOUT"]["START_INDEX"]}'
         font_color = Config()["COLORS"]["PAGE_NUMBER_FONT"]
         font = self.get_font_for_block(BlockType.HEADER)
         if font:
@@ -78,10 +74,10 @@ class ImageGenerator:
         for idx, block in enumerate(blocks):
             if img == None:
                 img = BlockImageFactory.create_background_image(
-                block.type,
-                Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
-                Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"],
-            )
+                    block.type,
+                    Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
+                    Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"],
+                )
 
             if block.type != "title":
                 self.draw_page_number(img, current_page)
@@ -90,7 +86,7 @@ class ImageGenerator:
             block_height = self.draw_text_on_image(img, block, current_height)
             current_height = block_height
 
-            if current_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]* 0.8:
+            if current_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
                 images.append(img)
                 img = None
         if img is not None:
