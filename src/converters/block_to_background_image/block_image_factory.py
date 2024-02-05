@@ -2,11 +2,10 @@ from PIL import Image
 from src.data.background_image_type import BackgroundImageType
 from src.utils.config import Config
 
-
 class BlockImageFactory:
-    _config = Config()
+    _config: Config = Config()
 
-    PATHS_TO_IMAGES = {
+    PATHS_TO_IMAGES: dict = {
         BackgroundImageType.TITLE: _config["PATHS"]["TITLE_PAGE"],
         BackgroundImageType.NORMAL: _config["PATHS"]["DEFAULT_PAGE"],
         BackgroundImageType.FINAL: _config["PATHS"]["FINAL_PAGE"],
@@ -14,7 +13,7 @@ class BlockImageFactory:
     }
 
     @classmethod
-    def create_background_image(cls, block_type_str, width, height):
+    def create_background_image(cls, block_type_str: str, width: int, height: int) -> Image.Image:
         block_type = cls._translate_block_type(block_type_str)
         bg_image_path = cls.PATHS_TO_IMAGES.get(block_type)
 
@@ -30,7 +29,7 @@ class BlockImageFactory:
         return image
 
     @staticmethod
-    def _translate_block_type(block_type_str):
+    def _translate_block_type(block_type_str: str) -> BackgroundImageType:
         translation_map = {
             "title": BackgroundImageType.TITLE,
             "final": BackgroundImageType.FINAL,
