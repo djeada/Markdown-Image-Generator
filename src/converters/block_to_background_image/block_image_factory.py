@@ -23,7 +23,7 @@ class BlockImageFactory:
         bg_image_path = cls.PATHS_TO_IMAGES.get(block_type)
 
         try:
-            if Path(bg_image_path).is_file():
+            if bg_image_path is not None and Path(bg_image_path).is_file():
                 image = Image.open(bg_image_path).resize((width, height))
             else:
                 bg_color = cls._config.get("BG_COLOR", "black")
