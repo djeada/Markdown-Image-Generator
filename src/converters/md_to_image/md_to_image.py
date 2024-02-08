@@ -28,6 +28,8 @@ class MarkdownToImageConverter:
             md_to_text = MarkdownToTextBlock()
 
             content = markdown_reader.read(self.input_file)
+            if content is None:
+                raise
             text_blocks = md_to_text.run(content)
             flatten_text_blocks = list(itertools.chain.from_iterable(text_blocks))
 
