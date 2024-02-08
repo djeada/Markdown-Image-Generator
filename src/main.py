@@ -1,9 +1,12 @@
 import argparse
+import logging
 from pathlib import Path
 
 from src.converters.md_to_image.md_to_image import MarkdownToImageConverter
 from src.input_output.image_saver import ImageSaver
 from src.utils.config import Config
+
+logger = logging.getLogger(__name__)
 
 
 class CommandLineInterface:
@@ -50,6 +53,9 @@ def main():
 
     converter = MarkdownToImageConverter(input_file=cli.args.input_file)
     images = converter.convert()
+    if images is None:
+        logger.error("No image could be generated")
+        return 1
 
     if cli.args.output_directory:
         image_saver = ImageSaver(cli.args.output_directory)
