@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PIL import Image
 from src.data.background_image_type import BackgroundImageType
 from src.utils.config import Config
@@ -21,7 +23,7 @@ class BlockImageFactory:
         bg_image_path = cls.PATHS_TO_IMAGES.get(block_type)
 
         try:
-            if bg_image_path:
+            if Path(bg_image_path).is_file():
                 image = Image.open(bg_image_path).resize((width, height))
             else:
                 bg_color = cls._config.get("BG_COLOR", "black")
