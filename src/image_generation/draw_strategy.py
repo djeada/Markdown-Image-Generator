@@ -45,10 +45,11 @@ class DrawStrategy(ABC):
 
 class DrawDefault:
     def __init__(
-        self, text_color: str, highlight_color: str = "#ffab00", is_title=False
+        self,
+        text_color: str,
     ):
         self.text_color = text_color
-        self.highlight_color = highlight_color
+        self.highlight_color = Config()["COLORS"]["HIGHLIGHT"]
 
     def find_highlighted_sections(self, text: str) -> List[Tuple[int, int]]:
         highlights = []
@@ -139,6 +140,9 @@ class DrawTable:
         self.scale_factor = Config()["TABLE"]["SCALE_FACTOR"]
         self.background_color = Config()["TABLE"]["BACKGROUND"]
         self.text_color = Config()["TABLE"]["FOREGROUND"]
+        self.highlight_color = Config()["TABLE"]["HIGHLIGHT"]
+        self.header_fg_color = Config()["TABLE"]["HEADER_FG_COLOR"]
+        self.header_bg_color = Config()["TABLE"]["HEADER_BG_COLOR"]
 
     def draw(
         self, img: Image, text: str, font, current_height: int
@@ -190,9 +194,9 @@ class DrawTable:
         :param img_width: The width of the image to fit the table.
         :return: The table as an image.
         """
-        img_width = 0.9 * img_width
+        img_width *= 0.9
         fig_width = img_width / 80  # Convert pixel to inches, assuming 80 dpi
-        fig_height = 6.5  # Adjust this value as needed
+        fig_height = Config()["TABLE"]["HEIGHT"]
 
         # Set transparent background with the facecolor parameter
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="none")
@@ -218,7 +222,7 @@ class DrawTable:
 
             # if re.match(r"\*.*\*$", val):
             if val.startswith("*") or val.endswith("*"):
-                cell.get_text().set_color("#ffab00")  # Set color to red
+                cell.get_text().set_color(self.highlight_color)  # Set color to red
                 unwrapped_val = val.replace("*", "")
                 cell.get_text().set_text(
                     textwrap.fill(unwrapped_val, width=wrapping_width)
@@ -228,15 +232,16 @@ class DrawTable:
 
         for i, label in enumerate(df.columns):
             label = textwrap.fill(str(label), width=wrapping_width)
-            table.add_cell(
+            cell = table.add_cell(
                 -1,
                 i,
                 width=width,
                 height=0.2,
                 text=label,
                 loc="center",
-                facecolor="#8c52ff",
+                facecolor=self.header_bg_color,
             )
+            cell.get_text().set_color(self.header_fg_color)
 
         table.auto_set_font_size(False)
         table.set_fontsize(15)
@@ -365,7 +370,7 @@ class DrawCode:
 
         draw.rounded_rectangle(
             (0, 0, rounded_rect.width, rounded_rect.height),
-            fill=hex_to_rgba(Config().get("CODE_BLOCK_BG")),
+            fill=hex_to_rgba(Config()["CODE_BLOCK"]["BACKGROUND"]),
             radius=corner_radius,
         )
 
@@ -441,13 +446,13 @@ class DrawCode:
 
         rounded_rect = self._create_rounded_rect(
             code_img.width,
-            code_img.height + Config()["CODE_BLOCK_TOP_PADDING"],
-            Config()["CODE_BLOCK_RADIUS"],
-            Config()["CODE_BLOCK_RADIUS"],
+            code_img.height + Config()["CODE_BLOCK"]["TOP_PADDING"],
+            Config()["CODE_BLOCK"]["RADIUS"],
+            Config()["CODE_BLOCK"]["RADIUS"],
         )
         rounded_rect.paste(
             code_img,
-            (10, 10 + Config()["CODE_BLOCK_TOP_PADDING"]),
+            (10, 10 + Config()["CODE_BLOCK"]["TOP_PADDING"]),
             code_img,
         )  # 10 is the padding
 

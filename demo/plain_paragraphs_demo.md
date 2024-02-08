@@ -8,7 +8,7 @@ Technology has revolutionized the way we communicate. With the rise of smartphon
 
 ### Work and Employment
 
-Automation and digitalization have reshaped the job market. While they have brought efficiency and convenience, they have also raised concerns about job displacement and the need for new skill sets. Remote work and flexible job arrangements have become more prevalent, altering traditional workplace dynamics.
+Automation and digitization have reshaped the job market. While they have brought efficiency and convenience, they have also raised concerns about job displacement and the need for new skill sets. Remote work and flexible job arrangements have become more prevalent, altering traditional workplace dynamics.
 
 ### Healthcare
 

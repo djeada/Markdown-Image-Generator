@@ -1,4 +1,5 @@
 import logging
+import traceback
 from typing import List, Dict, Optional
 from PIL import Image, ImageFont, ImageDraw
 
@@ -48,11 +49,6 @@ class ImageGenerator:
                 "font_size": height // 32,
                 "line_height": height // 30,
             },
-            BlockType.BULLET: {
-                "font_size": height // 30,
-                "line_height": height // 28,
-            },
-            # You can add additional block types here
         }
 
     def draw_page_number(self, image: Image, page_num: int) -> None:
@@ -72,7 +68,7 @@ class ImageGenerator:
 
         img = None
         for idx, block in enumerate(blocks):
-            if img == None:
+            if img is None:
                 img = BlockImageFactory.create_background_image(
                     block.type,
                     Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
@@ -82,13 +78,37 @@ class ImageGenerator:
             if block.type != "title":
                 self.draw_page_number(img, current_page)
 
-            # Now draw the block on the appropriate image
-            block_height = self.draw_text_on_image(img, block, current_height)
-            current_height = block_height
+            # Create a copy of the current image to draw on
+            img_copy = img.copy()
 
-            if current_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
+            # Draw on the copy to check the new height
+            block_height = self.draw_text_on_image(img_copy, block, current_height)
+
+            # Check if the height difference is too large
+            height_difference = block_height - current_height
+            if height_difference > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
+                raise Exception("Block height difference exceeds allowable limit")
+
+            if block_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
+                # If the block height exceeds the limit, reset current height and increment page
+                current_height = Config()["PAGE_LAYOUT"]["TOP_MARGIN"]
+                current_page += 1
                 images.append(img)
-                img = None
+                img = BlockImageFactory.create_background_image(
+                    block.type,
+                    Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"],
+                    Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"],
+                )
+                if block.type != "title":
+                    self.draw_page_number(img, current_page)
+                # Draw the block on the new image
+                block_height = self.draw_text_on_image(img, block, current_height)
+                current_height = int(block_height)
+            else:
+                # If the block height does not exceed the limit, redraw on the original image
+                current_height = int(block_height)
+                img = img_copy
+
         if img is not None:
             images.append(img)
 
@@ -120,8 +140,7 @@ class ImageGenerator:
             BlockType.PARAGRAPH: DrawDefault(self.text_color),
             BlockType.TABLE: DrawTable(self.text_color),
             BlockType.CODE: DrawCode(),
-            BlockType.BULLET: DrawDefault(self.text_color),
-            BlockType.TITLE: DrawDefault(self.text_color, is_title=True),
+            BlockType.TITLE: DrawDefault(self.text_color),
         }
         strategy = strategies.get(
             BlockType[block.type.upper()], strategies[BlockType.PARAGRAPH]
@@ -130,5 +149,8 @@ class ImageGenerator:
             _, block_height = strategy.draw(img, block.data, font, current_height)
             return block_height
         except Exception as e:
-            logger.error(f"Error drawing text on image: {e}")
+            error_message = (
+                f"Error drawing text on image: {e}\n{traceback.format_exc()}"
+            )
+            logger.error(error_message)
             return 0

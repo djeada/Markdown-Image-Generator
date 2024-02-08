@@ -40,6 +40,7 @@ class Config:
             "PAGE_NUMBER_FONT": "#292929",
             "TEXT": "#FFFFFF",
             "BACKGROUND": "#000000",
+            "HIGHLIGHT": "#ffab00",
         },
         "CODE_BLOCK": {
             "SCALE_FACTOR": 2,
@@ -51,6 +52,10 @@ class Config:
             "SCALE_FACTOR": 1,
             "FOREGROUND": "#FFFFFF",
             "BACKGROUND": "#292929",
+            "HIGHLIGHT": "#ffab00",
+            "HEADER_BG_COLOR": "#8c52ff",
+            "HEADER_FG_COLOR": "#000000",
+            "HEIGHT": 8,
         },
     }
 

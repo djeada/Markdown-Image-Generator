@@ -1,3 +1,4 @@
+import itertools
 import logging
 from typing import List, Optional
 from PIL import Image
@@ -28,12 +29,10 @@ class MarkdownToImageConverter:
 
             content = markdown_reader.read(self.input_file)
             text_blocks = md_to_text.run(content)
+            flatten_text_blocks = list(itertools.chain.from_iterable(text_blocks))
 
-            return [
-                image
-                for text_block in text_blocks
-                for image in image_generator.generate_images(text_block)
-            ]
+            return image_generator.generate_images(flatten_text_blocks)
+
         except Exception as e:
             logger.error(f"Error generating images: {e}", exc_info=True)
             return None

@@ -7,7 +7,6 @@ class BlockType(Enum):
     HEADER = auto()
     TABLE = auto()
     CODE = auto()
-    BULLET = auto()
     TITLE = auto()
 
 

@@ -2,6 +2,7 @@ from PIL import Image
 from src.data.background_image_type import BackgroundImageType
 from src.utils.config import Config
 
+
 class BlockImageFactory:
     _config: Config = Config()
 
@@ -13,7 +14,9 @@ class BlockImageFactory:
     }
 
     @classmethod
-    def create_background_image(cls, block_type_str: str, width: int, height: int) -> Image.Image:
+    def create_background_image(
+        cls, block_type_str: str, width: int, height: int
+    ) -> Image.Image:
         block_type = cls._translate_block_type(block_type_str)
         bg_image_path = cls.PATHS_TO_IMAGES.get(block_type)
 
