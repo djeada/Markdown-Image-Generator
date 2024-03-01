@@ -60,7 +60,12 @@ class DrawDefault:
             elif char == "*" and start is not None:
                 highlights.append((start, i))
                 start = None
-        return highlights
+        combined_pairs = [
+            (highlights[i][0], highlights[i + 1][1])
+            for i in range(0, len(highlights), 2)
+            if i + 1 < len(highlights)
+        ]
+        return combined_pairs
 
     def draw(
         self,
@@ -70,8 +75,9 @@ class DrawDefault:
         current_height: int,
     ) -> Tuple[Image.Image, int]:
 
+        # TODO: MAKE CONFIGURABLE
         if text.strip()[0].isdigit():
-            current_height += font.font.height * 1.5
+            current_height += font.font.height * 1.2
         d = ImageDraw.Draw(img)
         img_width = img.size[0]
 
@@ -101,7 +107,7 @@ class DrawDefault:
                 if section_start < len(line) and section_end < len(line):
                     text_width += font.getbbox("a")[2]
                     highlight_text = line[
-                        section_start + 1 : section_end
+                        section_start + 2 : section_end - 1
                     ]  # Exclude asterisks
                     d.text(
                         (text_width, current_height),
@@ -110,6 +116,8 @@ class DrawDefault:
                         font=font,
                     )
                     text_width += font.getmask(highlight_text).getbbox()[2]
+                # TODO: MAKE SURE NO OVERLAP ON LOGIC ON WHOLE TEXT AND LINES SPLIT
+                highlighted_sections.remove((section_start, section_end))
             # Draw the remaining part of the line, if any
             remaining_text = line[start_pos:]
             if remaining_text:

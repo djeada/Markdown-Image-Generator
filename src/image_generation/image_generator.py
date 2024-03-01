@@ -28,6 +28,7 @@ class ImageGenerator:
 
     def initialize_block_styles(self) -> Dict[BlockType, Dict]:
         height = self.height
+        ## TODO: MAKE CONFIGURABLE
         return {
             BlockType.TITLE: {
                 "font_size": height // 12,
@@ -145,8 +146,13 @@ class ImageGenerator:
         strategy = strategies.get(
             BlockType[block.type.upper()], strategies[BlockType.PARAGRAPH]
         )
+        additional_height = (
+            30 if BlockType[block.type.upper()] == BlockType.HEADER else 0
+        )
         try:
-            _, block_height = strategy.draw(img, block.data, font, current_height)
+            _, block_height = strategy.draw(
+                img, block.data, font, current_height + additional_height
+            )
             return block_height
         except Exception as e:
             error_message = (
