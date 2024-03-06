@@ -90,7 +90,7 @@ class ImageGenerator:
             if height_difference > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
                 raise Exception("Block height difference exceeds allowable limit")
 
-            if block_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
+            if block_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] - Config()["PAGE_LAYOUT"]["BOTTOM_MARGIN"]:
                 # If the block height exceeds the limit, reset current height and increment page
                 current_height = Config()["PAGE_LAYOUT"]["TOP_MARGIN"]
                 current_page += 1

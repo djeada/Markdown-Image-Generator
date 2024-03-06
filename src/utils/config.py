@@ -28,6 +28,7 @@ class Config:
         },
         "PAGE_LAYOUT": {
             "TOP_MARGIN": 250,
+            "BOTTOM_MARGIN": 250,
             "RIGHT_MARGIN": 80,
             "IMAGE_WIDTH": 1080,
             "IMAGE_HEIGHT": 1080,

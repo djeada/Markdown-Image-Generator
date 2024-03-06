@@ -214,10 +214,15 @@ class DrawTable:
         nrows, ncols = df.shape
         width, height = 1.0 / ncols, 1.0 / nrows
 
-        wrapping_width = 25  # Adjust this value as needed
+        wrapping_width = 14  # TODO: Move to CONFIG Adjust this value as needed
 
         for (i, j), val in np.ndenumerate(df):
-            val = textwrap.fill(str(val), width=wrapping_width)
+            # Split the cell text on '<br/>' and join with newline characters
+            split_vals = str(val).split('<br>')
+            wrapped_vals = [textwrap.fill(part, width=wrapping_width) for part
+                            in split_vals]
+            val = '\n\n'.join(wrapped_vals)
+
             cell = table.add_cell(
                 i,
                 j,
@@ -252,7 +257,7 @@ class DrawTable:
             cell.get_text().set_color(self.header_fg_color)
 
         table.auto_set_font_size(False)
-        table.set_fontsize(15)
+        table.set_fontsize(16)
         table.scale(1, 1.5)
 
         ax.add_table(table)
@@ -466,4 +471,4 @@ class DrawCode:
 
         img, height = self._paste_onto_image(img, rounded_rect, current_height)
 
-        return img, height
+        return img, height + 50 # make configurable
