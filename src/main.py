@@ -6,6 +6,7 @@ from src.converters.md_to_image.md_to_image import MarkdownToImageConverter
 from src.input_output.image_saver import ImageSaver
 from src.utils.config import Config
 
+VERSION = "0.1.0"
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +19,12 @@ class CommandLineInterface:
     def create_parser():
         parser = argparse.ArgumentParser(
             description="Convert a Markdown file to a series of images."
+        )
+        parser.add_argument(
+            "--version",
+            action="version",
+            version=f"Markdown Image Generator v{VERSION}",
+            help="Show program's version number and exit",
         )
         parser.add_argument("input_file", help="The input Markdown file.")
         parser.add_argument(
