@@ -1,7 +1,7 @@
 import os
 import pytest
 from pathlib import Path
-from build.test_utils import run_as_module
+from tests.test_utils import run_as_module
 
 pytestmark = [
     pytest.mark.e2e,
