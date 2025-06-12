@@ -1,0 +1,18 @@
+# Core dependencies
+-r requirements.txt
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.1
+
+# Build tools
+nuitka>=1.8.0
+ordered-set>=4.1.0  # Required by nuitka
+zstandard>=0.21.0   # Required by nuitka for compression
+
+# Development tools
+black>=23.7.0
+isort>=5.12.0
+flake8>=6.1.0
+mypy>=1.4.1
