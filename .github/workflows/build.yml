@@ -1,0 +1,86 @@
+name: Build Executable
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_platform:
+        description: 'Target platform for the build'
+        required: true
+        default: 'linux'
+        type: choice
+        options:
+        - linux
+        - windows
+        - macos
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-latest
+            binary_ext: ''
+          - platform: windows
+            os: windows-latest
+            binary_ext: '.exe'
+          - platform: macos
+            os: macos-latest
+            binary_ext: ''
+    
+    if: github.event.inputs.target_platform == matrix.platform
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install build dependencies (Linux)
+      if: matrix.platform == 'linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y patchelf
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    
+    - name: Install build dependencies (Windows/MacOS)
+      if: matrix.platform != 'linux'
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    
+    - name: Build executable
+      run: |
+        chmod +x build/build.sh
+        ./build/build.sh
+      shell: bash
+    
+    - name: Test executable
+      run: |
+        chmod +x dist/md-image-generator${{ matrix.binary_ext }}
+        ./dist/md-image-generator${{ matrix.binary_ext }} --version
+        ./dist/md-image-generator${{ matrix.binary_ext }} --help
+      shell: bash
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: md-image-generator-${{ matrix.platform }}
+        path: dist/md-image-generator${{ matrix.binary_ext }}
+        
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/md-image-generator${{ matrix.binary_ext }}
+        name: "Markdown Image Generator ${{ github.sha }}"
+        tag_name: "build-${{ github.sha }}"
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

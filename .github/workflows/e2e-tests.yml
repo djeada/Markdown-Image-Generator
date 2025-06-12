@@ -1,4 +1,4 @@
-name: E2E Tests and Build
+name: E2E Tests
 
 on:
   push:
@@ -29,39 +29,3 @@ jobs:
     - name: Run E2E tests
       run: |
         pytest tests/e2e_tests/ -v -m "e2e"
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
-    
-    - name: Install build dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y patchelf
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-    
-    - name: Build executable
-      run: |
-        chmod +x build/build.sh
-        ./build/build.sh
-    
-    - name: Test executable basics
-      run: |
-        chmod +x dist/md_image_generator
-        ./dist/md_image_generator --version
-        ./dist/md_image_generator --help
-    
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: md-image-generator-linux
-        path: dist/md_image_generator

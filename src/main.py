@@ -15,6 +15,10 @@ class CommandLineInterface:
         parser = self.create_parser()
         self.args = parser.parse_args()
 
+        # Validate input file exists
+        if not Path(self.args.input_file).exists():
+            parser.error(f"Input file does not exist: {self.args.input_file}")
+
     @staticmethod
     def create_parser():
         parser = argparse.ArgumentParser(

@@ -1,0 +1,41 @@
+{
+    "PATHS": {
+        "DEFAULT_PAGE": "../resources/page.png",
+        "TITLE_PAGE": "../resources/intro.png",
+        "FINAL_PAGE": "../resources/final.png",
+        "QUESTION_PAGE": "../resources/challenge.png",
+        "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    },
+    "PAGE_LAYOUT": {
+        "TOP_MARGIN": 250,
+        "BOTTOM_MARGIN": 250,
+        "RIGHT_MARGIN": 80,
+        "IMAGE_WIDTH": 1080,
+        "IMAGE_HEIGHT": 1080,
+        "CHAR_WIDTH": 15,
+        "DEFAULT_LINE_HEIGHT": 30,
+        "LIST_LINE_HEIGHT": 20,
+        "START_INDEX": 0
+    },
+    "COLORS": {
+        "PAGE_NUMBER_FONT": "#292929",
+        "TEXT": "#FFFFFF",
+        "BACKGROUND": "#000000",
+        "HIGHLIGHT": "#ffab00"
+    },
+    "CODE_BLOCK": {
+        "SCALE_FACTOR": 2,
+        "BACKGROUND": "#000000",
+        "RADIUS": 20,
+        "TOP_PADDING": 50
+    },
+    "TABLE": {
+        "SCALE_FACTOR": 1,
+        "FOREGROUND": "#FFFFFF",
+        "BACKGROUND": "#292929",
+        "HIGHLIGHT": "#ffab00",
+        "HEADER_BG_COLOR": "#8c52ff",
+        "HEADER_FG_COLOR": "#000000",
+        "HEIGHT": 8
+    }
+}
