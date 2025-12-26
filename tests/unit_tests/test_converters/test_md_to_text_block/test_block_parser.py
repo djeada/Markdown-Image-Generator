@@ -5,6 +5,10 @@ from src.converters.md_to_text_block.block_parser import (
     HeaderParser,
     TableBlockParser,
     TitleParser,
+    BulletListParser,
+    NumberedListParser,
+    BlockquoteParser,
+    HorizontalRuleParser,
 )
 from src.data.text_block import TextBlock
 
@@ -27,6 +31,26 @@ def code_block_parser():
 @pytest.fixture
 def table_block_parser():
     return TableBlockParser()
+
+
+@pytest.fixture
+def bullet_list_parser():
+    return BulletListParser()
+
+
+@pytest.fixture
+def numbered_list_parser():
+    return NumberedListParser()
+
+
+@pytest.fixture
+def blockquote_parser():
+    return BlockquoteParser()
+
+
+@pytest.fixture
+def horizontal_rule_parser():
+    return HorizontalRuleParser()
 
 
 def test_title_parser(title_parser):
@@ -81,3 +105,87 @@ def test_table_block_parser(table_block_parser):
     assert isinstance(block, TextBlock)
     assert block.type == "table"
     assert block.data == "| Header 1 | Header 2 |\n| Row 1 | Data 1 |"
+
+
+def test_bullet_list_parser(bullet_list_parser):
+    """Test bullet list parsing with - prefix."""
+    assert bullet_list_parser.is_start_line("- First item")
+    assert not bullet_list_parser.is_start_line("Not a list item")
+
+    # Reset to test * prefix
+    bullet_list_parser.reset()
+    assert bullet_list_parser.is_start_line("* Second item")
+
+    # Reset and test full parsing
+    bullet_list_parser.reset()
+    bullet_list_parser.is_start_line("- First item")  # Trigger parsing mode
+    bullet_list_parser.parse("- First item")
+    bullet_list_parser.parse("- Second item")
+    
+    # End the list with a non-list line
+    assert bullet_list_parser.is_end_line("Other content")
+
+    block = bullet_list_parser.get_block()
+    assert isinstance(block, TextBlock)
+    assert block.type == "bullet_list"
+    assert block.data == "First item\nSecond item"
+
+
+def test_numbered_list_parser(numbered_list_parser):
+    """Test numbered list parsing with numeric prefix."""
+    assert numbered_list_parser.is_start_line("1. First item")
+    assert not numbered_list_parser.is_start_line("Not a list item")
+
+    # Reset to test another numbered item
+    numbered_list_parser.reset()
+    assert numbered_list_parser.is_start_line("2. Second item")
+
+    # Reset and test full parsing
+    numbered_list_parser.reset()
+    numbered_list_parser.is_start_line("1. First item")  # Trigger parsing mode
+    numbered_list_parser.parse("1. First item")
+    numbered_list_parser.parse("2. Second item")
+    numbered_list_parser.parse("3. Third item")
+    
+    # End the list with a non-list line
+    assert numbered_list_parser.is_end_line("Other content")
+
+    block = numbered_list_parser.get_block()
+    assert isinstance(block, TextBlock)
+    assert block.type == "numbered_list"
+    assert block.data == "First item\nSecond item\nThird item"
+
+
+def test_blockquote_parser(blockquote_parser):
+    """Test blockquote parsing with > prefix."""
+    assert blockquote_parser.is_start_line("> This is a quote")
+    assert not blockquote_parser.is_start_line("Not a quote")
+
+    blockquote_parser.parse("> This is a quote")
+    blockquote_parser.parse("> Another line")
+    
+    # End the quote with a non-quote line
+    assert blockquote_parser.is_end_line("Other content")
+
+    block = blockquote_parser.get_block()
+    assert isinstance(block, TextBlock)
+    assert block.type == "blockquote"
+    assert block.data == "This is a quote\nAnother line"
+
+
+def test_horizontal_rule_parser(horizontal_rule_parser):
+    """Test horizontal rule parsing."""
+    assert horizontal_rule_parser.is_start_line("---")
+    assert horizontal_rule_parser.is_start_line("***")
+    assert horizontal_rule_parser.is_start_line("___")
+    assert not horizontal_rule_parser.is_start_line("--")  # Too short
+    assert not horizontal_rule_parser.is_start_line("Not a rule")
+
+    # Single line element
+    assert horizontal_rule_parser.is_end_line("---")
+
+    horizontal_rule_parser.parse("---")
+    block = horizontal_rule_parser.get_block()
+    assert isinstance(block, TextBlock)
+    assert block.type == "horizontal_rule"
+    assert block.data == "---"

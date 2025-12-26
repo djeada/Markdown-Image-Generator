@@ -8,6 +8,10 @@ class BlockType(Enum):
     TABLE = auto()
     CODE = auto()
     TITLE = auto()
+    BULLET_LIST = auto()
+    NUMBERED_LIST = auto()
+    BLOCKQUOTE = auto()
+    HORIZONTAL_RULE = auto()
 
 
 class TextBlock:

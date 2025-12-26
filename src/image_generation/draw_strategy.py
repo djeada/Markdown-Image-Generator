@@ -85,7 +85,6 @@ class DrawDefault:
         lines = textwrap.wrap(text, width=char_per_line, break_long_words=False)
 
         highlighted_sections = self.find_highlighted_sections(text)
-        print(lines, current_height)
 
         for i, line in enumerate(lines):
             text_width = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
@@ -472,3 +471,255 @@ class DrawCode:
         img, height = self._paste_onto_image(img, rounded_rect, current_height)
 
         return img, height + 50 # make configurable
+
+
+class DrawBulletList:
+    """
+    Drawing strategy for bullet lists with stylish bullet points.
+    """
+
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.highlight_color = Config()["COLORS"]["HIGHLIGHT"]
+        self.bullet_color = Config()["COLORS"].get("BULLET_COLOR", self.highlight_color)
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        bullet_indent = 30
+        img_width = img.size[0]
+        
+        items = text.split("\n")
+        char_per_line = (img_width - left_margin - bullet_indent - 50) // font.getbbox("a")[2]
+        
+        for item in items:
+            if not item.strip():
+                continue
+                
+            # Draw bullet point (filled circle)
+            bullet_radius = 6
+            bullet_x = left_margin + bullet_indent
+            bullet_y = current_height + font.font.height // 2
+            d.ellipse(
+                [
+                    (bullet_x - bullet_radius, bullet_y - bullet_radius),
+                    (bullet_x + bullet_radius, bullet_y + bullet_radius)
+                ],
+                fill=self.bullet_color
+            )
+            
+            # Wrap text for long items
+            wrapped_lines = textwrap.wrap(item, width=int(char_per_line), break_long_words=False)
+            text_x = bullet_x + bullet_radius * 3
+            
+            for line in wrapped_lines:
+                d.text(
+                    (text_x, current_height),
+                    line,
+                    fill=self.text_color,
+                    font=font,
+                )
+                current_height += font.font.height * 1.4
+            
+            current_height += 5  # Extra spacing between items
+        
+        return img, current_height + 10
+
+
+class DrawNumberedList:
+    """
+    Drawing strategy for numbered/ordered lists.
+    """
+
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.highlight_color = Config()["COLORS"]["HIGHLIGHT"]
+        self.number_color = Config()["COLORS"].get("NUMBER_COLOR", self.highlight_color)
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        number_indent = 30
+        img_width = img.size[0]
+        
+        items = text.split("\n")
+        char_per_line = (img_width - left_margin - number_indent - 80) // font.getbbox("a")[2]
+        
+        for idx, item in enumerate(items, 1):
+            if not item.strip():
+                continue
+            
+            # Draw number in a circle
+            number_str = str(idx)
+            circle_radius = 14
+            circle_x = left_margin + number_indent
+            circle_y = current_height + font.font.height // 2
+            
+            # Draw circle background
+            d.ellipse(
+                [
+                    (circle_x - circle_radius, circle_y - circle_radius),
+                    (circle_x + circle_radius, circle_y + circle_radius)
+                ],
+                fill=self.number_color
+            )
+            
+            # Draw number centered in circle
+            try:
+                number_font = ImageFont.truetype(Config()["PATHS"]["FONT"], size=font.size - 4)
+            except Exception:
+                number_font = font
+            
+            # Get text bounding box for centering
+            bbox = d.textbbox((0, 0), number_str, font=number_font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+            
+            d.text(
+                (circle_x - text_width // 2, circle_y - text_height // 2 - 2),
+                number_str,
+                fill="#000000",
+                font=number_font,
+            )
+            
+            # Wrap text for long items
+            wrapped_lines = textwrap.wrap(item, width=int(char_per_line), break_long_words=False)
+            text_x = circle_x + circle_radius * 2 + 10
+            
+            for line in wrapped_lines:
+                d.text(
+                    (text_x, current_height),
+                    line,
+                    fill=self.text_color,
+                    font=font,
+                )
+                current_height += font.font.height * 1.4
+            
+            current_height += 8  # Extra spacing between items
+        
+        return img, current_height + 10
+
+
+class DrawBlockquote:
+    """
+    Drawing strategy for blockquotes with a stylish left border.
+    """
+
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.quote_color = Config()["COLORS"].get("QUOTE_COLOR", "#888888")
+        self.border_color = Config()["COLORS"]["HIGHLIGHT"]
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        border_width = 4
+        quote_indent = 30
+        img_width = img.size[0]
+        
+        start_height = current_height
+        lines = text.split("\n")
+        char_per_line = (img_width - left_margin - quote_indent - 100) // font.getbbox("a")[2]
+        
+        # Use italic-style rendering (slightly different color for quotes)
+        quote_text_color = self.quote_color
+        
+        for line in lines:
+            if not line.strip():
+                current_height += font.font.height * 0.5
+                continue
+            
+            wrapped_lines = textwrap.wrap(line, width=int(char_per_line), break_long_words=False)
+            text_x = left_margin + quote_indent + 20
+            
+            for wrapped_line in wrapped_lines:
+                d.text(
+                    (text_x, current_height),
+                    wrapped_line,
+                    fill=quote_text_color,
+                    font=font,
+                )
+                current_height += font.font.height * 1.4
+        
+        # Draw left border
+        border_x = left_margin + quote_indent
+        d.rectangle(
+            [
+                (border_x, start_height - 5),
+                (border_x + border_width, current_height + 5)
+            ],
+            fill=self.border_color
+        )
+        
+        return img, current_height + 20
+
+
+class DrawHorizontalRule:
+    """
+    Drawing strategy for horizontal rules/dividers.
+    """
+
+    def __init__(self, text_color: str):
+        self.line_color = Config()["COLORS"].get("DIVIDER_COLOR", "#555555")
+        self.accent_color = Config()["COLORS"]["HIGHLIGHT"]
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        img_width = img.size[0]
+        
+        # Add some vertical spacing
+        current_height += 20
+        
+        # Draw a stylish horizontal line with gradient effect
+        line_y = current_height
+        line_start = left_margin + 50
+        line_end = img_width - left_margin - 50
+        line_height = 2
+        
+        # Draw main line
+        d.rectangle(
+            [(line_start, line_y), (line_end, line_y + line_height)],
+            fill=self.line_color
+        )
+        
+        # Draw accent diamond in the center
+        center_x = (line_start + line_end) // 2
+        diamond_size = 8
+        d.polygon(
+            [
+                (center_x, line_y - diamond_size),
+                (center_x + diamond_size, line_y + line_height // 2),
+                (center_x, line_y + line_height + diamond_size),
+                (center_x - diamond_size, line_y + line_height // 2),
+            ],
+            fill=self.accent_color
+        )
+        
+        current_height += 30
+        
+        return img, current_height

@@ -1,9 +1,10 @@
 {
     "PATHS": {
-        "TITLE_PAGE": "/tmp/pytest-of-runner/pytest-0/test_translate_block_type0/title.jpg",
-        "DEFAULT_PAGE": "/tmp/pytest-of-runner/pytest-0/test_translate_block_type0/default.jpg",
-        "FINAL_PAGE": "/tmp/pytest-of-runner/pytest-0/test_translate_block_type0/final.jpg",
-        "QUESTION_PAGE": "/tmp/pytest-of-runner/pytest-0/test_translate_block_type0/question.jpg"
+        "TITLE_PAGE": "resources/intro.png",
+        "DEFAULT_PAGE": "resources/page.png",
+        "FINAL_PAGE": "resources/final.png",
+        "QUESTION_PAGE": "resources/page.png",
+        "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     },
     "PAGE_LAYOUT": {
         "TOP_MARGIN": 250,
@@ -20,11 +21,15 @@
         "PAGE_NUMBER_FONT": "#292929",
         "TEXT": "#FFFFFF",
         "BACKGROUND": "#000000",
-        "HIGHLIGHT": "#ffab00"
+        "HIGHLIGHT": "#ffab00",
+        "BULLET_COLOR": "#ffab00",
+        "NUMBER_COLOR": "#ffab00",
+        "QUOTE_COLOR": "#CCCCCC",
+        "DIVIDER_COLOR": "#555555"
     },
     "CODE_BLOCK": {
         "SCALE_FACTOR": 2,
-        "BACKGROUND": "#000000",
+        "BACKGROUND": "#1e1e1e",
         "RADIUS": 20,
         "TOP_PADDING": 50
     },
@@ -34,7 +39,15 @@
         "BACKGROUND": "#292929",
         "HIGHLIGHT": "#ffab00",
         "HEADER_BG_COLOR": "#8c52ff",
-        "HEADER_FG_COLOR": "#000000",
+        "HEADER_FG_COLOR": "#FFFFFF",
         "HEIGHT": 8
+    },
+    "THEME": {
+        "NAME": "dark",
+        "GRADIENT": {
+            "ENABLED": false,
+            "START_COLOR": "#1a1a2e",
+            "END_COLOR": "#16213e"
+        }
     }
 }

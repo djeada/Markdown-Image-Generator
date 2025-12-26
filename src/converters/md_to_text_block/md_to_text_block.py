@@ -8,6 +8,10 @@ from src.converters.md_to_text_block.block_parser import (
     TableBlockParser,
     HeaderParser,
     TitleParser,
+    BulletListParser,
+    NumberedListParser,
+    BlockquoteParser,
+    HorizontalRuleParser,
 )
 from src.converters.md_to_text_block.sections_parser import SectionParser
 from src.data.text_block import TextBlock
@@ -23,6 +27,10 @@ class MarkdownToTextBlock:
         self.parsers = [
             CodeBlockParser(),
             TableBlockParser(),
+            BulletListParser(),
+            NumberedListParser(),
+            BlockquoteParser(),
+            HorizontalRuleParser(),
             HeaderParser(),
             TitleParser(),
         ]
