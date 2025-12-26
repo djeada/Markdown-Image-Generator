@@ -1,6 +1,7 @@
 from src.data.text_block import TextBlock
 
 from abc import ABC, abstractmethod
+import re
 
 
 class BlockParser(ABC):
@@ -111,25 +112,6 @@ class CodeBlockParser(BlockParser):
 
 class TableBlockParser(BlockParser):
     def is_start_line(self, line: str) -> bool:
-        line = line.strip()
-        return "|" in line and "-" not in line
-
-    def is_end_line(self, line: str) -> bool:
-        line = line.strip()
-        return "|" not in line
-
-    def parse(self, line: str):
-        self.content.append(line.strip())
-
-    def get_block(self) -> TextBlock:
-        return TextBlock("table", "\n".join(self.content))
-
-    def reset(self):
-        self.content = []
-
-
-class TableBlockParser(BlockParser):
-    def is_start_line(self, line: str) -> bool:
         return "|" in line and "-" not in line
 
     def is_end_line(self, line: str) -> bool:
@@ -143,3 +125,158 @@ class TableBlockParser(BlockParser):
 
     def reset(self):
         self.content = []
+
+
+class BulletListParser(BlockParser):
+    """Parser for unordered bullet lists (- or * prefixed items)."""
+
+    def __init__(self):
+        super().__init__()
+        self.content = []
+        self.is_parsing = False
+
+    def is_start_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if not self.is_parsing and (
+            stripped.startswith("- ") or stripped.startswith("* ")
+        ):
+            self.is_parsing = True
+            return True
+        return False
+
+    def is_end_line(self, line: str) -> bool:
+        stripped = line.strip()
+        # End when we hit a non-list line (empty or different content)
+        if self.is_parsing and not (
+            stripped.startswith("- ") or stripped.startswith("* ")
+        ):
+            self.is_parsing = False
+            return True
+        return False
+
+    def parse(self, line: str):
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            self.content.append(stripped[2:])
+        elif stripped.startswith("* "):
+            self.content.append(stripped[2:])
+
+    def get_block(self) -> TextBlock:
+        block = TextBlock("bullet_list", "\n".join(self.content))
+        self.content = []
+        return block
+
+    def reset(self):
+        self.content = []
+        self.is_parsing = False
+
+
+class NumberedListParser(BlockParser):
+    """Parser for ordered numbered lists (1. 2. 3. prefixed items)."""
+
+    def __init__(self):
+        super().__init__()
+        self.content = []
+        self.is_parsing = False
+
+    def is_start_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if not self.is_parsing and re.match(r"^\d+\.\s", stripped):
+            self.is_parsing = True
+            return True
+        return False
+
+    def is_end_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if self.is_parsing and not re.match(r"^\d+\.\s", stripped):
+            self.is_parsing = False
+            return True
+        return False
+
+    def parse(self, line: str):
+        stripped = line.strip()
+        match = re.match(r"^\d+\.\s(.+)$", stripped)
+        if match:
+            self.content.append(match.group(1))
+
+    def get_block(self) -> TextBlock:
+        block = TextBlock("numbered_list", "\n".join(self.content))
+        self.content = []
+        return block
+
+    def reset(self):
+        self.content = []
+        self.is_parsing = False
+
+
+class BlockquoteParser(BlockParser):
+    """Parser for blockquotes (> prefixed lines)."""
+
+    def __init__(self):
+        super().__init__()
+        self.content = []
+        self.is_parsing = False
+
+    def is_start_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if not self.is_parsing and stripped.startswith(">"):
+            self.is_parsing = True
+            return True
+        return False
+
+    def is_end_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if self.is_parsing and not stripped.startswith(">"):
+            self.is_parsing = False
+            return True
+        return False
+
+    def parse(self, line: str):
+        stripped = line.strip()
+        if stripped.startswith("> "):
+            self.content.append(stripped[2:])
+        elif stripped.startswith(">"):
+            self.content.append(stripped[1:])
+
+    def get_block(self) -> TextBlock:
+        block = TextBlock("blockquote", "\n".join(self.content))
+        self.content = []
+        return block
+
+    def reset(self):
+        self.content = []
+        self.is_parsing = False
+
+
+class HorizontalRuleParser(BlockParser):
+    """Parser for horizontal rules (---, ***, ___)."""
+
+    def __init__(self):
+        super().__init__()
+        self.content = ""
+
+    def is_start_line(self, line: str) -> bool:
+        stripped = line.strip()
+        return (
+            len(stripped) >= 3
+            and (
+                all(c == "-" for c in stripped)
+                or all(c == "*" for c in stripped)
+                or all(c == "_" for c in stripped)
+            )
+            and not stripped.startswith("```")
+        )
+
+    def is_end_line(self, line: str) -> bool:
+        return True  # Single line element
+
+    def parse(self, line: str):
+        self.content = "---"
+
+    def get_block(self) -> TextBlock:
+        block = TextBlock("horizontal_rule", self.content)
+        self.content = ""
+        return block
+
+    def reset(self):
+        self.content = ""

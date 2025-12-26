@@ -11,6 +11,10 @@ from src.image_generation.draw_strategy import (
     DrawDefault,
     DrawTable,
     DrawCode,
+    DrawBulletList,
+    DrawNumberedList,
+    DrawBlockquote,
+    DrawHorizontalRule,
 )
 from src.utils.config import Config
 
@@ -48,6 +52,22 @@ class ImageGenerator:
             },
             BlockType.CODE: {
                 "font_size": height // 32,
+                "line_height": height // 30,
+            },
+            BlockType.BULLET_LIST: {
+                "font_size": height // 40,
+                "line_height": height // 30,
+            },
+            BlockType.NUMBERED_LIST: {
+                "font_size": height // 40,
+                "line_height": height // 30,
+            },
+            BlockType.BLOCKQUOTE: {
+                "font_size": height // 42,
+                "line_height": height // 32,
+            },
+            BlockType.HORIZONTAL_RULE: {
+                "font_size": height // 40,
                 "line_height": height // 30,
             },
         }
@@ -142,6 +162,10 @@ class ImageGenerator:
             BlockType.TABLE: DrawTable(self.text_color),
             BlockType.CODE: DrawCode(),
             BlockType.TITLE: DrawDefault(self.text_color),
+            BlockType.BULLET_LIST: DrawBulletList(self.text_color),
+            BlockType.NUMBERED_LIST: DrawNumberedList(self.text_color),
+            BlockType.BLOCKQUOTE: DrawBlockquote(self.text_color),
+            BlockType.HORIZONTAL_RULE: DrawHorizontalRule(self.text_color),
         }
         strategy = strategies.get(
             BlockType[block.type.upper()], strategies[BlockType.PARAGRAPH]

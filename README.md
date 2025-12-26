@@ -1,6 +1,6 @@
 # Markdown Image Generator
 
-The Markdown Image Generator is a Python-based project that transforms Markdown documents into a series of images. It aims to provide a unique way to visualize Markdown content, especially useful for presentations, sharing over image-based platforms, or even for educational purposes.
+The Markdown Image Generator is a Python-based project that transforms Markdown documents into a series of beautiful, presentation-ready images. It aims to provide a unique way to visualize Markdown content, especially useful for presentations, sharing over image-based platforms, or even for educational purposes.
 
 ## Overview
 
@@ -31,18 +31,29 @@ Below is a system diagram illustrating the workflow of the Markdown Image Genera
 
 ## Features
 
-- Parses different types of Markdown elements like headers, paragraphs, bullet lists, tables and code blocks.
-- Each block of Markdown content is translated into a block of text in an image.
-- Supports multiline blocks for code and tables.
-- Adjustable image size and text wrapping.
-- Supports custom styling for different block types.
-- Option to use a background image for the generated images.
+### Markdown Elements Support
+- **Headers & Titles**: Beautifully rendered section headers
+- **Paragraphs**: Clean text rendering with automatic text wrapping
+- **Bullet Lists**: Stylish bullet points with customizable colors
+- **Numbered Lists**: Circular numbered badges for ordered content
+- **Code Blocks**: Syntax-highlighted code with a modern terminal-like appearance
+- **Tables**: Professional table rendering with customizable colors
+- **Blockquotes**: Elegant quote styling with accent border
+- **Horizontal Rules**: Decorative dividers with diamond accents
+
+### Styling & Customization
+- Adjustable image size and text wrapping
+- Custom styling for different block types
+- Option to use background images for generated slides
+- **Gradient backgrounds**: Modern gradient effects for a polished look
+- Configurable colors for text, highlights, bullets, and more
+- Theme support for consistent styling
 
 ## Usage Examples
 
 For instance, the following Markdown content:
 
-```
+```markdown
 ### Packing Tips
 
 Before your trip, make sure to pack these essentials:
@@ -100,11 +111,86 @@ After installation, you can start using the Markdown Image Generator to convert 
 2. **Run the Generator**: Use the following command to generate images from your Markdown file:
 
 ```bash
-python main.py yourfile.md
+python -m src.main yourfile.md -o output_folder
 ```
 
 Replace `yourfile.md` with the path to your Markdown file.
 
+### Command Line Options
+
+```
+usage: main.py [-h] [--version] [-o OUTPUT] [-c CONFIG] [--no-show] input_file
+
+Convert a Markdown file to a series of images.
+
+positional arguments:
+  input_file            The input Markdown file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             Show program's version number and exit
+  -o, --output OUTPUT   The directory where the output images will be saved.
+  -c, --config CONFIG   Path to the configuration file.
+  --no-show             Do not display the images on the screen.
+```
+
+### Using Custom Configuration
+
+You can customize the appearance by providing a custom config file:
+
+```bash
+python -m src.main yourfile.md -o output_folder -c my_config.json
+```
+
+## Configuration
+
+The `config.json` file allows you to customize various aspects of the generated images:
+
+### Colors Configuration
+
+```json
+{
+    "COLORS": {
+        "TEXT": "#FFFFFF",
+        "BACKGROUND": "#000000",
+        "HIGHLIGHT": "#ffab00",
+        "BULLET_COLOR": "#ffab00",
+        "NUMBER_COLOR": "#ffab00",
+        "QUOTE_COLOR": "#CCCCCC",
+        "DIVIDER_COLOR": "#555555"
+    }
+}
+```
+
+### Gradient Backgrounds
+
+Enable beautiful gradient backgrounds:
+
+```json
+{
+    "THEME": {
+        "GRADIENT": {
+            "ENABLED": true,
+            "START_COLOR": "#1a1a2e",
+            "END_COLOR": "#16213e"
+        }
+    }
+}
+```
+
+### Page Layout
+
+```json
+{
+    "PAGE_LAYOUT": {
+        "TOP_MARGIN": 250,
+        "BOTTOM_MARGIN": 250,
+        "RIGHT_MARGIN": 80,
+        "IMAGE_WIDTH": 1080,
+        "IMAGE_HEIGHT": 1080
+    }
+}
+```
 
 ## How to Contribute
 
