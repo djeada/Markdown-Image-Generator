@@ -34,6 +34,9 @@ Below is a system diagram illustrating the workflow of the Markdown Image Genera
 ### Markdown Elements Support
 - **Headers & Titles**: Beautifully rendered section headers
 - **Paragraphs**: Clean text rendering with automatic text wrapping
+- **Bold Text**: Highlighted text with **double asterisks** or __underscores__
+- **Italic Text**: Styled text with *single asterisks* or _underscores_
+- **Links**: Clickable-style text from markdown links [like this](url)
 - **Bullet Lists**: Stylish bullet points with customizable colors
 - **Numbered Lists**: Circular numbered badges for ordered content
 - **Code Blocks**: Syntax-highlighted code with a modern terminal-like appearance
@@ -46,7 +49,7 @@ Below is a system diagram illustrating the workflow of the Markdown Image Genera
 - Custom styling for different block types
 - Option to use background images for generated slides
 - **Gradient backgrounds**: Modern gradient effects for a polished look
-- Configurable colors for text, highlights, bullets, and more
+- Configurable colors for text, highlights, italics, links, bullets, and more
 - Theme support for consistent styling
 
 ## Usage Examples
@@ -154,6 +157,8 @@ The `config.json` file allows you to customize various aspects of the generated 
         "TEXT": "#FFFFFF",
         "BACKGROUND": "#000000",
         "HIGHLIGHT": "#ffab00",
+        "ITALIC_COLOR": "#e0e0e0",
+        "LINK_COLOR": "#5dade2",
         "BULLET_COLOR": "#ffab00",
         "NUMBER_COLOR": "#ffab00",
         "QUOTE_COLOR": "#CCCCCC",
