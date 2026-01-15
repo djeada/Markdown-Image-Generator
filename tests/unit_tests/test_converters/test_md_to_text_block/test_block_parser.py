@@ -9,6 +9,7 @@ from src.converters.md_to_text_block.block_parser import (
     NumberedListParser,
     BlockquoteParser,
     HorizontalRuleParser,
+    TaskListParser,
 )
 from src.data.text_block import TextBlock
 
@@ -51,6 +52,11 @@ def blockquote_parser():
 @pytest.fixture
 def horizontal_rule_parser():
     return HorizontalRuleParser()
+
+
+@pytest.fixture
+def task_list_parser():
+    return TaskListParser()
 
 
 def test_title_parser(title_parser):
@@ -189,3 +195,39 @@ def test_horizontal_rule_parser(horizontal_rule_parser):
     assert isinstance(block, TextBlock)
     assert block.type == "horizontal_rule"
     assert block.data == "---"
+
+
+def test_task_list_parser(task_list_parser):
+    """Test task list parsing with checkbox syntax."""
+    # Test unchecked task
+    assert task_list_parser.is_start_line("- [ ] Unchecked task")
+    assert not task_list_parser.is_start_line("- Regular list item")
+    
+    # Reset to test checked task
+    task_list_parser.reset()
+    assert task_list_parser.is_start_line("- [x] Checked task")
+    
+    # Reset to test uppercase X
+    task_list_parser.reset()
+    assert task_list_parser.is_start_line("- [X] Checked task")
+    
+    # Reset to test * prefix
+    task_list_parser.reset()
+    assert task_list_parser.is_start_line("* [ ] Unchecked task")
+    
+    # Reset and test full parsing
+    task_list_parser.reset()
+    task_list_parser.is_start_line("- [x] First task")  # Trigger parsing mode
+    task_list_parser.parse("- [x] First task")
+    task_list_parser.parse("- [ ] Second task")
+    task_list_parser.parse("- [X] Third task")
+    
+    # End the list with a non-task line
+    assert task_list_parser.is_end_line("Other content")
+    
+    block = task_list_parser.get_block()
+    assert isinstance(block, TextBlock)
+    assert block.type == "task_list"
+    assert "checked:First task" in block.data
+    assert "unchecked:Second task" in block.data
+    assert "checked:Third task" in block.data

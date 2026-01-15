@@ -12,6 +12,7 @@ from src.converters.md_to_text_block.block_parser import (
     NumberedListParser,
     BlockquoteParser,
     HorizontalRuleParser,
+    TaskListParser,
 )
 from src.converters.md_to_text_block.sections_parser import SectionParser
 from src.data.text_block import TextBlock
@@ -27,6 +28,7 @@ class MarkdownToTextBlock:
         self.parsers = [
             CodeBlockParser(),
             TableBlockParser(),
+            TaskListParser(),  # Must come before BulletListParser
             BulletListParser(),
             NumberedListParser(),
             BlockquoteParser(),

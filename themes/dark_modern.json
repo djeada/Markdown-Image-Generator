@@ -33,17 +33,13 @@
         "INLINE_CODE_BG": "#282a36",
         "INLINE_CODE_FG": "#50fa7b",
         "HEADER_COLOR": "#00d4ff",
-        "TITLE_COLOR": "#ffffff",
-        "SHADOW_COLOR": "#000000"
+        "TITLE_COLOR": "#ffffff"
     },
     "CODE_BLOCK": {
         "SCALE_FACTOR": 2,
         "BACKGROUND": "#282a36",
         "RADIUS": 16,
-        "TOP_PADDING": 50,
-        "SHADOW_ENABLED": true,
-        "SHADOW_OFFSET": 8,
-        "SHADOW_BLUR": 15
+        "TOP_PADDING": 50
     },
     "TABLE": {
         "SCALE_FACTOR": 1,
@@ -52,8 +48,6 @@
         "HIGHLIGHT": "#00d4ff",
         "HEADER_BG_COLOR": "#6272a4",
         "HEADER_FG_COLOR": "#f8f8f2",
-        "BORDER_COLOR": "#44475a",
-        "ALT_ROW_BG": "#21222c",
         "HEIGHT": 8
     },
     "THEME": {
@@ -69,16 +63,5 @@
             "START_COLOR": "#00d4ff",
             "END_COLOR": "#bd93f9"
         }
-    },
-    "TYPOGRAPHY": {
-        "TITLE_SCALE": 1.2,
-        "HEADER_SCALE": 1.0,
-        "PARAGRAPH_SCALE": 0.85,
-        "LINE_SPACING": 1.5
-    },
-    "EFFECTS": {
-        "ROUNDED_CORNERS": true,
-        "SHADOWS": true,
-        "GLOW": false
     }
 }

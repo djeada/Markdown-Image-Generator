@@ -1,0 +1,67 @@
+{
+    "PATHS": {
+        "TITLE_PAGE": "resources/intro.png",
+        "DEFAULT_PAGE": "resources/page.png",
+        "FINAL_PAGE": "resources/final.png",
+        "QUESTION_PAGE": "resources/page.png",
+        "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    },
+    "PAGE_LAYOUT": {
+        "TOP_MARGIN": 120,
+        "BOTTOM_MARGIN": 120,
+        "LEFT_MARGIN": 80,
+        "RIGHT_MARGIN": 80,
+        "IMAGE_WIDTH": 1080,
+        "IMAGE_HEIGHT": 1080,
+        "CHAR_WIDTH": 15,
+        "DEFAULT_LINE_HEIGHT": 30,
+        "LIST_LINE_HEIGHT": 20,
+        "START_INDEX": 0
+    },
+    "COLORS": {
+        "PAGE_NUMBER_FONT": "#ffffff",
+        "TEXT": "#ffffff",
+        "BACKGROUND": "#1a1a2e",
+        "HIGHLIGHT": "#ff6b6b",
+        "ITALIC_COLOR": "#c9d1d9",
+        "LINK_COLOR": "#4ecdc4",
+        "BULLET_COLOR": "#ff6b6b",
+        "NUMBER_COLOR": "#ffe66d",
+        "QUOTE_COLOR": "#c9d1d9",
+        "QUOTE_BORDER": "#4ecdc4",
+        "DIVIDER_COLOR": "#495057",
+        "INLINE_CODE_BG": "#2d2d44",
+        "INLINE_CODE_FG": "#4ecdc4",
+        "HEADER_COLOR": "#ff6b6b",
+        "TITLE_COLOR": "#ffffff"
+    },
+    "CODE_BLOCK": {
+        "SCALE_FACTOR": 2,
+        "BACKGROUND": "#2d2d44",
+        "RADIUS": 16,
+        "TOP_PADDING": 50
+    },
+    "TABLE": {
+        "SCALE_FACTOR": 1,
+        "FOREGROUND": "#ffffff",
+        "BACKGROUND": "#2d2d44",
+        "HIGHLIGHT": "#ff6b6b",
+        "HEADER_BG_COLOR": "#ff6b6b",
+        "HEADER_FG_COLOR": "#1a1a2e",
+        "HEIGHT": 8
+    },
+    "THEME": {
+        "NAME": "vibrant_creative",
+        "GRADIENT": {
+            "ENABLED": true,
+            "START_COLOR": "#667eea",
+            "END_COLOR": "#764ba2",
+            "DIRECTION": "diagonal"
+        },
+        "ACCENT_GRADIENT": {
+            "ENABLED": true,
+            "START_COLOR": "#ff6b6b",
+            "END_COLOR": "#4ecdc4"
+        }
+    }
+}
