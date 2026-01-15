@@ -1,9 +1,10 @@
 {
     "PATHS": {
-        "TITLE_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/title.jpg",
-        "DEFAULT_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/default.jpg",
-        "FINAL_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/final.jpg",
-        "QUESTION_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/question.jpg"
+        "TITLE_PAGE": "resources/intro.png",
+        "DEFAULT_PAGE": "resources/page.png",
+        "FINAL_PAGE": "resources/final.png",
+        "QUESTION_PAGE": "resources/page.png",
+        "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     },
     "PAGE_LAYOUT": {
         "TOP_MARGIN": 120,
