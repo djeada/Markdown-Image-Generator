@@ -108,10 +108,11 @@ class ImageGenerator:
                 fill=accent_color
             )
             
-            # Draw page number centered in badge
+            # Draw page number centered in badge using background color for contrast
+            page_num_text_color = Config()["COLORS"].get("BACKGROUND", "#000000")
             text_x = position_x - text_width // 2
             text_y = position_y - text_height // 2 - 4
-            draw.text((text_x, text_y), page_num_str, fill="#000000", font=font)
+            draw.text((text_x, text_y), page_num_str, fill=page_num_text_color, font=font)
 
     def generate_images(self, blocks: List[TextBlock]):
         images = []

@@ -1,9 +1,9 @@
 {
     "PATHS": {
-        "TITLE_PAGE": "/tmp/pytest-of-runner/pytest-4/test_translate_block_type0/title.jpg",
-        "DEFAULT_PAGE": "/tmp/pytest-of-runner/pytest-4/test_translate_block_type0/default.jpg",
-        "FINAL_PAGE": "/tmp/pytest-of-runner/pytest-4/test_translate_block_type0/final.jpg",
-        "QUESTION_PAGE": "/tmp/pytest-of-runner/pytest-4/test_translate_block_type0/question.jpg"
+        "TITLE_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/title.jpg",
+        "DEFAULT_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/default.jpg",
+        "FINAL_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/final.jpg",
+        "QUESTION_PAGE": "/tmp/pytest-of-runner/pytest-5/test_translate_block_type0/question.jpg"
     },
     "PAGE_LAYOUT": {
         "TOP_MARGIN": 120,

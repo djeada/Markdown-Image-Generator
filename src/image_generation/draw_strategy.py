@@ -822,10 +822,12 @@ class DrawNumberedList:
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
             
+            # Use background color for number text to ensure contrast
+            number_text_color = Config()["COLORS"].get("BACKGROUND", "#0f0f23")
             d.text(
                 (circle_x - text_width // 2, circle_y - text_height // 2 - 2),
                 number_str,
-                fill="#0f0f23",  # Dark color for contrast
+                fill=number_text_color,
                 font=number_font,
             )
             
@@ -898,8 +900,9 @@ class DrawBlockquote:
             img_width - right_margin,
             start_height + total_line_height + bg_padding
         ]
-        # Draw subtle background
-        d.rounded_rectangle(bg_rect, radius=8, fill="#1a1a2e")
+        # Draw subtle background using a darker shade of the background color
+        quote_bg = Config()["COLORS"].get("INLINE_CODE_BG", "#1a1a2e")
+        d.rounded_rectangle(bg_rect, radius=8, fill=quote_bg)
         
         # Draw quote text
         for line in lines:
@@ -1061,13 +1064,14 @@ class DrawTaskList:
                     radius=2,
                     fill=self.checked_color
                 )
-                # Draw check symbol
+                # Draw check symbol using background color for contrast
+                check_color = Config()["COLORS"].get("BACKGROUND", "#0f0f23")
                 check_points = [
                     (box_x + 5, box_y + box_size // 2),
                     (box_x + box_size // 2 - 1, box_y + box_size - 6),
                     (box_x + box_size - 4, box_y + 5)
                 ]
-                d.line(check_points, fill="#0f0f23", width=2)
+                d.line(check_points, fill=check_color, width=2)
             
             # Wrap text for long items
             wrapped_lines = textwrap.wrap(item_text, width=int(char_per_line), break_long_words=False)
