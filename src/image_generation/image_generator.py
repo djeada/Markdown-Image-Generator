@@ -9,12 +9,15 @@ from src.converters.block_to_background_image.block_image_factory import (
 from src.data.text_block import TextBlock, BlockType
 from src.image_generation.draw_strategy import (
     DrawDefault,
+    DrawHeader,
+    DrawTitle,
     DrawTable,
     DrawCode,
     DrawBulletList,
     DrawNumberedList,
     DrawBlockquote,
     DrawHorizontalRule,
+    DrawTaskList,
 )
 from src.utils.config import Config
 
@@ -70,17 +73,45 @@ class ImageGenerator:
                 "font_size": height // 40,
                 "line_height": height // 30,
             },
+            BlockType.TASK_LIST: {
+                "font_size": height // 40,
+                "line_height": height // 30,
+            },
         }
 
     def draw_page_number(self, image: Image, page_num: int) -> None:
-        # Define a position and style for the page number and draw it
-        position = (self.width - 170, 120)
+        """Draw page number with modern styling in a badge."""
         draw = ImageDraw.Draw(image)
         page_num_str = f'{page_num + Config()["PAGE_LAYOUT"]["START_INDEX"]}'
         font_color = Config()["COLORS"]["PAGE_NUMBER_FONT"]
         font = self.get_font_for_block(BlockType.HEADER)
+        
         if font:
-            draw.text(position, page_num_str, fill=font_color, font=font)
+            # Get text dimensions
+            bbox = draw.textbbox((0, 0), page_num_str, font=font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+            
+            # Position in top-right corner
+            padding = 20
+            badge_radius = max(text_width, text_height) // 2 + padding
+            position_x = self.width - badge_radius - 40
+            position_y = badge_radius + 40
+            
+            # Draw circular badge background
+            accent_color = Config()["COLORS"]["HIGHLIGHT"]
+            draw.ellipse(
+                [
+                    (position_x - badge_radius, position_y - badge_radius),
+                    (position_x + badge_radius, position_y + badge_radius)
+                ],
+                fill=accent_color
+            )
+            
+            # Draw page number centered in badge
+            text_x = position_x - text_width // 2
+            text_y = position_y - text_height // 2 - 4
+            draw.text((text_x, text_y), page_num_str, fill="#000000", font=font)
 
     def generate_images(self, blocks: List[TextBlock]):
         images = []
@@ -161,11 +192,13 @@ class ImageGenerator:
             BlockType.PARAGRAPH: DrawDefault(self.text_color),
             BlockType.TABLE: DrawTable(self.text_color),
             BlockType.CODE: DrawCode(),
-            BlockType.TITLE: DrawDefault(self.text_color),
+            BlockType.TITLE: DrawTitle(self.text_color),
+            BlockType.HEADER: DrawHeader(self.text_color),
             BlockType.BULLET_LIST: DrawBulletList(self.text_color),
             BlockType.NUMBERED_LIST: DrawNumberedList(self.text_color),
             BlockType.BLOCKQUOTE: DrawBlockquote(self.text_color),
             BlockType.HORIZONTAL_RULE: DrawHorizontalRule(self.text_color),
+            BlockType.TASK_LIST: DrawTaskList(self.text_color),
         }
         strategy = strategies.get(
             BlockType[block.type.upper()], strategies[BlockType.PARAGRAPH]

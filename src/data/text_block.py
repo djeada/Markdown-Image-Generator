@@ -12,6 +12,7 @@ class BlockType(Enum):
     NUMBERED_LIST = auto()
     BLOCKQUOTE = auto()
     HORIZONTAL_RULE = auto()
+    TASK_LIST = auto()
 
 
 class TextBlock:

@@ -280,3 +280,58 @@ class HorizontalRuleParser(BlockParser):
 
     def reset(self):
         self.content = ""
+
+
+class TaskListParser(BlockParser):
+    """Parser for task lists (- [ ] or - [x] prefixed items)."""
+
+    def __init__(self):
+        super().__init__()
+        self.content = []
+        self.is_parsing = False
+
+    def is_start_line(self, line: str) -> bool:
+        stripped = line.strip()
+        if not self.is_parsing and (
+            stripped.startswith("- [ ]") or stripped.startswith("- [x]") or
+            stripped.startswith("- [X]") or stripped.startswith("* [ ]") or
+            stripped.startswith("* [x]") or stripped.startswith("* [X]")
+        ):
+            self.is_parsing = True
+            return True
+        return False
+
+    def is_end_line(self, line: str) -> bool:
+        stripped = line.strip()
+        # End when we hit a non-task-list line
+        if self.is_parsing and not (
+            stripped.startswith("- [ ]") or stripped.startswith("- [x]") or
+            stripped.startswith("- [X]") or stripped.startswith("* [ ]") or
+            stripped.startswith("* [x]") or stripped.startswith("* [X]")
+        ):
+            self.is_parsing = False
+            return True
+        return False
+
+    def parse(self, line: str):
+        stripped = line.strip()
+        # Extract checked state and text
+        if stripped.startswith("- [x]") or stripped.startswith("- [X]"):
+            self.content.append(("checked", stripped[5:].strip()))
+        elif stripped.startswith("* [x]") or stripped.startswith("* [X]"):
+            self.content.append(("checked", stripped[5:].strip()))
+        elif stripped.startswith("- [ ]"):
+            self.content.append(("unchecked", stripped[5:].strip()))
+        elif stripped.startswith("* [ ]"):
+            self.content.append(("unchecked", stripped[5:].strip()))
+
+    def get_block(self) -> TextBlock:
+        # Encode as "checked:text" or "unchecked:text" separated by newlines
+        items = [f"{state}:{text}" for state, text in self.content]
+        block = TextBlock("task_list", "\n".join(items))
+        self.content = []
+        return block
+
+    def reset(self):
+        self.content = []
+        self.is_parsing = False

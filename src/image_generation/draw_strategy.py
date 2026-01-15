@@ -3,7 +3,7 @@ import textwrap
 from abc import ABC, abstractmethod
 
 import numpy as np
-from PIL import ImageFont, ImageDraw, Image
+from PIL import ImageFont, ImageDraw, Image, ImageFilter
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
@@ -52,38 +52,51 @@ class DrawDefault:
         self.highlight_color = Config()["COLORS"]["HIGHLIGHT"]
         self.italic_color = Config()["COLORS"].get("ITALIC_COLOR", self.text_color)
         self.link_color = Config()["COLORS"].get("LINK_COLOR", "#5dade2")
+        self.inline_code_bg = Config()["COLORS"].get("INLINE_CODE_BG", "#282a36")
+        self.inline_code_fg = Config()["COLORS"].get("INLINE_CODE_FG", "#50fa7b")
 
     def parse_formatted_words(self, text: str) -> List[Tuple[str, str]]:
         """
         Parse text and return a list of words with formatting info.
         Returns list of tuples: (word, format_type)
-        format_type can be: 'normal', 'bold', 'italic', 'link'
+        format_type can be: 'normal', 'bold', 'italic', 'link', 'inline_code'
         Each word includes any trailing space.
         """
         result = []
         
-        # First, handle links [text](url) - replace with just text
+        # First, handle inline code `code`
+        inline_code_pattern = re.compile(r'`([^`]+)`')
+        inline_code_ranges = []
+        
+        cleaned_text = text
+        offset = 0
+        for match in inline_code_pattern.finditer(text):
+            code_text = match.group(1)
+            start_pos = match.start() - offset
+            end_pos = start_pos + len(code_text)
+            inline_code_ranges.append((start_pos, end_pos))
+            offset += len(match.group(0)) - len(code_text)
+        
+        cleaned_text = inline_code_pattern.sub(r'\1', text)
+        
+        # Handle links [text](url) - replace with just text
         link_pattern = re.compile(r'\[([^\]]+)\]\([^)]+\)')
         link_ranges = []
         
-        # Find all link matches and track their positions in the cleaned text
-        cleaned_text = text
         offset = 0
-        for match in link_pattern.finditer(text):
+        for match in link_pattern.finditer(cleaned_text):
             link_text = match.group(1)
             start_pos = match.start() - offset
             end_pos = start_pos + len(link_text)
             link_ranges.append((start_pos, end_pos))
             offset += len(match.group(0)) - len(link_text)
         
-        cleaned_text = link_pattern.sub(r'\1', text)
+        cleaned_text = link_pattern.sub(r'\1', cleaned_text)
         
         # Pattern for bold (**text** or __text__)
         bold_pattern = re.compile(r'\*\*(.+?)\*\*|__(.+?)__')
         bold_ranges = []
         
-        # Find bold ranges in the link-cleaned text
-        temp_text = cleaned_text
         offset = 0
         for match in bold_pattern.finditer(cleaned_text):
             bold_text = match.group(1) or match.group(2)
@@ -98,7 +111,6 @@ class DrawDefault:
         italic_pattern = re.compile(r'(?<!\*)\*([^*]+?)\*(?!\*)|(?<!_)_([^_]+?)_(?!_)')
         italic_ranges = []
         
-        # Find italic ranges
         offset = 0
         for match in italic_pattern.finditer(cleaned_text):
             italic_text = match.group(1) or match.group(2)
@@ -118,11 +130,17 @@ class DrawDefault:
             word_start = current_pos
             word_end = current_pos + len(word)
             
-            # Check formatting (priority: bold > italic > link)
-            for bold_start, bold_end in bold_ranges:
-                if word_start < bold_end and word_end > bold_start:
-                    format_type = 'bold'
+            # Check formatting (priority: inline_code > bold > italic > link)
+            for code_start, code_end in inline_code_ranges:
+                if word_start < code_end and word_end > code_start:
+                    format_type = 'inline_code'
                     break
+            
+            if format_type == 'normal':
+                for bold_start, bold_end in bold_ranges:
+                    if word_start < bold_end and word_end > bold_start:
+                        format_type = 'bold'
+                        break
             
             if format_type == 'normal':
                 for italic_start, italic_end in italic_ranges:
@@ -154,6 +172,8 @@ class DrawDefault:
             return self.italic_color
         elif format_type == 'link':
             return self.link_color
+        elif format_type == 'inline_code':
+            return self.inline_code_fg
         return self.text_color
 
     def draw(
@@ -165,7 +185,7 @@ class DrawDefault:
     ) -> Tuple[Image.Image, int]:
         d = ImageDraw.Draw(img)
         img_width = img.size[0]
-        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
         right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
 
         # Parse the text to get words with formatting
@@ -198,6 +218,17 @@ class DrawDefault:
             # Choose color based on formatting
             color = self.get_color_for_format(format_type)
             
+            # Draw inline code background if needed
+            if format_type == 'inline_code':
+                padding = 4
+                bg_rect = [
+                    x_position - padding,
+                    current_height - padding,
+                    x_position + word_width + padding,
+                    current_height + font.font.height + padding
+                ]
+                d.rounded_rectangle(bg_rect, radius=4, fill=self.inline_code_bg)
+            
             # Draw the word
             d.text((x_position, current_height), word_stripped, fill=color, font=font)
             
@@ -209,6 +240,105 @@ class DrawDefault:
         # Move to next line after finishing
         current_height += int(font.font.height * 1.5)
 
+        return img, current_height
+
+
+class DrawHeader:
+    """Drawing strategy for headers with accent styling."""
+    
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.header_color = Config()["COLORS"].get("HEADER_COLOR", "#00d4ff")
+        self.accent_color = Config()["COLORS"]["HIGHLIGHT"]
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        
+        # Draw accent line before header
+        accent_width = 4
+        accent_height = font.font.height
+        d.rectangle(
+            [
+                (left_margin - 20, current_height),
+                (left_margin - 20 + accent_width, current_height + accent_height)
+            ],
+            fill=self.accent_color
+        )
+        
+        # Draw header text
+        d.text((left_margin, current_height), text, fill=self.header_color, font=font)
+        
+        current_height += int(font.font.height * 1.8)
+        
+        return img, current_height
+
+
+class DrawTitle:
+    """Drawing strategy for titles with impressive styling."""
+    
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.title_color = Config()["COLORS"].get("TITLE_COLOR", "#ffffff")
+        self.accent_color = Config()["COLORS"]["HIGHLIGHT"]
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        img_width = img.size[0]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        max_width = img_width - left_margin - right_margin
+        
+        # Word wrap the title if needed
+        words = text.split()
+        lines = []
+        current_line = []
+        
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            bbox = font.getbbox(test_line)
+            if bbox[2] - bbox[0] <= max_width:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                current_line = [word]
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        # Draw each line of the title
+        for line in lines:
+            d.text((left_margin, current_height), line, fill=self.title_color, font=font)
+            current_height += int(font.font.height * 1.3)
+        
+        # Get the width of the first line for underline
+        if lines:
+            bbox = font.getbbox(lines[0])
+            text_width = bbox[2] - bbox[0]
+            
+            # Draw underline accent
+            line_y = current_height + 5
+            d.line(
+                [(left_margin, line_y), (left_margin + min(text_width, 200), line_y)],
+                fill=self.accent_color,
+                width=3
+            )
+        
+        current_height += int(font.font.height * 0.8)
+        
         return img, current_height
 
 
@@ -570,21 +700,35 @@ class DrawBulletList:
         current_height: int,
     ) -> Tuple[Image.Image, int]:
         d = ImageDraw.Draw(img)
-        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
         bullet_indent = 30
         img_width = img.size[0]
         
         items = text.split("\n")
-        char_per_line = (img_width - left_margin - bullet_indent - 50) // font.getbbox("a")[2]
+        char_per_line = (img_width - left_margin - bullet_indent - right_margin - 50) // font.getbbox("a")[2]
         
         for item in items:
             if not item.strip():
                 continue
                 
-            # Draw bullet point (filled circle)
+            # Draw bullet point (filled circle with glow effect)
             bullet_radius = 6
             bullet_x = left_margin + bullet_indent
             bullet_y = current_height + font.font.height // 2
+            
+            # Draw outer glow
+            d.ellipse(
+                [
+                    (bullet_x - bullet_radius - 2, bullet_y - bullet_radius - 2),
+                    (bullet_x + bullet_radius + 2, bullet_y + bullet_radius + 2)
+                ],
+                fill=None,
+                outline=self.bullet_color,
+                width=1
+            )
+            
+            # Draw bullet point
             d.ellipse(
                 [
                     (bullet_x - bullet_radius, bullet_y - bullet_radius),
@@ -595,25 +739,25 @@ class DrawBulletList:
             
             # Wrap text for long items
             wrapped_lines = textwrap.wrap(item, width=int(char_per_line), break_long_words=False)
-            text_x = bullet_x + bullet_radius * 3
+            text_x = bullet_x + bullet_radius * 3 + 5
             
-            for line in wrapped_lines:
+            for idx, line in enumerate(wrapped_lines):
                 d.text(
                     (text_x, current_height),
                     line,
                     fill=self.text_color,
                     font=font,
                 )
-                current_height += font.font.height * 1.4
+                current_height += int(font.font.height * 1.4)
             
-            current_height += 5  # Extra spacing between items
+            current_height += 8  # Extra spacing between items
         
-        return img, current_height + 10
+        return img, int(current_height + 15)
 
 
 class DrawNumberedList:
     """
-    Drawing strategy for numbered/ordered lists.
+    Drawing strategy for numbered/ordered lists with modern styling.
     """
 
     def __init__(self, text_color: str):
@@ -629,22 +773,34 @@ class DrawNumberedList:
         current_height: int,
     ) -> Tuple[Image.Image, int]:
         d = ImageDraw.Draw(img)
-        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
         number_indent = 30
         img_width = img.size[0]
         
         items = text.split("\n")
-        char_per_line = (img_width - left_margin - number_indent - 80) // font.getbbox("a")[2]
+        char_per_line = (img_width - left_margin - number_indent - right_margin - 80) // font.getbbox("a")[2]
         
         for idx, item in enumerate(items, 1):
             if not item.strip():
                 continue
             
-            # Draw number in a circle
+            # Draw number in a circle with gradient-like effect
             number_str = str(idx)
             circle_radius = 14
             circle_x = left_margin + number_indent
             circle_y = current_height + font.font.height // 2
+            
+            # Draw outer ring
+            d.ellipse(
+                [
+                    (circle_x - circle_radius - 2, circle_y - circle_radius - 2),
+                    (circle_x + circle_radius + 2, circle_y + circle_radius + 2)
+                ],
+                fill=None,
+                outline=self.number_color,
+                width=1
+            )
             
             # Draw circle background
             d.ellipse(
@@ -669,13 +825,13 @@ class DrawNumberedList:
             d.text(
                 (circle_x - text_width // 2, circle_y - text_height // 2 - 2),
                 number_str,
-                fill="#000000",
+                fill="#0f0f23",  # Dark color for contrast
                 font=number_font,
             )
             
             # Wrap text for long items
             wrapped_lines = textwrap.wrap(item, width=int(char_per_line), break_long_words=False)
-            text_x = circle_x + circle_radius * 2 + 10
+            text_x = circle_x + circle_radius * 2 + 15
             
             for line in wrapped_lines:
                 d.text(
@@ -684,22 +840,22 @@ class DrawNumberedList:
                     fill=self.text_color,
                     font=font,
                 )
-                current_height += font.font.height * 1.4
+                current_height += int(font.font.height * 1.4)
             
-            current_height += 8  # Extra spacing between items
+            current_height += 10  # Extra spacing between items
         
-        return img, current_height + 10
+        return img, int(current_height + 15)
 
 
 class DrawBlockquote:
     """
-    Drawing strategy for blockquotes with a stylish left border.
+    Drawing strategy for blockquotes with a stylish left border and background.
     """
 
     def __init__(self, text_color: str):
         self.text_color = text_color
         self.quote_color = Config()["COLORS"].get("QUOTE_COLOR", "#888888")
-        self.border_color = Config()["COLORS"]["HIGHLIGHT"]
+        self.border_color = Config()["COLORS"].get("QUOTE_BORDER", Config()["COLORS"]["HIGHLIGHT"])
 
     def draw(
         self,
@@ -709,21 +865,46 @@ class DrawBlockquote:
         current_height: int,
     ) -> Tuple[Image.Image, int]:
         d = ImageDraw.Draw(img)
-        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
         border_width = 4
         quote_indent = 30
         img_width = img.size[0]
         
         start_height = current_height
         lines = text.split("\n")
-        char_per_line = (img_width - left_margin - quote_indent - 100) // font.getbbox("a")[2]
+        char_per_line = (img_width - left_margin - quote_indent - right_margin - 100) // font.getbbox("a")[2]
         
-        # Use italic-style rendering (slightly different color for quotes)
-        quote_text_color = self.quote_color
-        
+        # Calculate total height first for background
+        temp_height = current_height
+        all_wrapped_lines = []
         for line in lines:
             if not line.strip():
-                current_height += font.font.height * 0.5
+                all_wrapped_lines.append(None)  # Empty line marker
+            else:
+                wrapped = textwrap.wrap(line, width=int(char_per_line), break_long_words=False)
+                all_wrapped_lines.extend(wrapped)
+        
+        # Draw semi-transparent background
+        total_line_height = sum(
+            int(font.font.height * 0.5) if line is None else int(font.font.height * 1.4)
+            for line in all_wrapped_lines
+        )
+        
+        bg_padding = 15
+        bg_rect = [
+            left_margin + quote_indent - bg_padding,
+            start_height - bg_padding,
+            img_width - right_margin,
+            start_height + total_line_height + bg_padding
+        ]
+        # Draw subtle background
+        d.rounded_rectangle(bg_rect, radius=8, fill="#1a1a2e")
+        
+        # Draw quote text
+        for line in lines:
+            if not line.strip():
+                current_height += int(font.font.height * 0.5)
                 continue
             
             wrapped_lines = textwrap.wrap(line, width=int(char_per_line), break_long_words=False)
@@ -733,10 +914,10 @@ class DrawBlockquote:
                 d.text(
                     (text_x, current_height),
                     wrapped_line,
-                    fill=quote_text_color,
+                    fill=self.quote_color,
                     font=font,
                 )
-                current_height += font.font.height * 1.4
+                current_height += int(font.font.height * 1.4)
         
         # Draw left border
         border_x = left_margin + quote_indent
@@ -748,12 +929,12 @@ class DrawBlockquote:
             fill=self.border_color
         )
         
-        return img, current_height + 20
+        return img, int(current_height + 25)
 
 
 class DrawHorizontalRule:
     """
-    Drawing strategy for horizontal rules/dividers.
+    Drawing strategy for horizontal rules/dividers with modern styling.
     """
 
     def __init__(self, text_color: str):
@@ -768,17 +949,21 @@ class DrawHorizontalRule:
         current_height: int,
     ) -> Tuple[Image.Image, int]:
         d = ImageDraw.Draw(img)
-        left_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
         img_width = img.size[0]
         
         # Add some vertical spacing
-        current_height += 20
+        current_height += 25
         
-        # Draw a stylish horizontal line with gradient effect
+        # Draw a stylish horizontal line
         line_y = current_height
         line_start = left_margin + 50
-        line_end = img_width - left_margin - 50
+        line_end = img_width - right_margin - 50
         line_height = 2
+        
+        # Draw gradient-like line (fade from edges)
+        center_x = (line_start + line_end) // 2
         
         # Draw main line
         d.rectangle(
@@ -787,8 +972,7 @@ class DrawHorizontalRule:
         )
         
         # Draw accent diamond in the center
-        center_x = (line_start + line_end) // 2
-        diamond_size = 8
+        diamond_size = 10
         d.polygon(
             [
                 (center_x, line_y - diamond_size),
@@ -799,6 +983,108 @@ class DrawHorizontalRule:
             fill=self.accent_color
         )
         
-        current_height += 30
+        # Draw small dots on either side of the diamond
+        dot_radius = 3
+        dot_offset = 30
+        for offset in [-dot_offset, dot_offset]:
+            d.ellipse(
+                [
+                    (center_x + offset - dot_radius, line_y - dot_radius + 1),
+                    (center_x + offset + dot_radius, line_y + dot_radius + 1)
+                ],
+                fill=self.accent_color
+            )
         
-        return img, current_height
+        current_height += 35
+        
+        return img, int(current_height)
+
+
+class DrawTaskList:
+    """
+    Drawing strategy for task lists (checkboxes) with modern styling.
+    """
+
+    def __init__(self, text_color: str):
+        self.text_color = text_color
+        self.highlight_color = Config()["COLORS"]["HIGHLIGHT"]
+        self.checked_color = Config()["COLORS"].get("BULLET_COLOR", self.highlight_color)
+        self.unchecked_color = Config()["COLORS"].get("DIVIDER_COLOR", "#555555")
+
+    def draw(
+        self,
+        img: Image.Image,
+        text: str,
+        font: ImageFont.FreeTypeFont,
+        current_height: int,
+    ) -> Tuple[Image.Image, int]:
+        d = ImageDraw.Draw(img)
+        left_margin = Config()["PAGE_LAYOUT"].get("LEFT_MARGIN", Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"])
+        right_margin = Config()["PAGE_LAYOUT"]["RIGHT_MARGIN"]
+        checkbox_indent = 30
+        img_width = img.size[0]
+        
+        items = text.split("\n")
+        char_per_line = (img_width - left_margin - checkbox_indent - right_margin - 70) // font.getbbox("a")[2]
+        
+        for item in items:
+            if not item.strip() or ":" not in item:
+                continue
+            
+            # Parse state and text
+            state, item_text = item.split(":", 1)
+            is_checked = state == "checked"
+            
+            # Draw checkbox
+            box_size = 18
+            box_x = left_margin + checkbox_indent
+            box_y = current_height + (font.font.height - box_size) // 2
+            
+            # Draw checkbox outline
+            d.rounded_rectangle(
+                [
+                    (box_x, box_y),
+                    (box_x + box_size, box_y + box_size)
+                ],
+                radius=4,
+                outline=self.checked_color if is_checked else self.unchecked_color,
+                width=2
+            )
+            
+            if is_checked:
+                # Draw checkmark
+                d.rounded_rectangle(
+                    [
+                        (box_x + 3, box_y + 3),
+                        (box_x + box_size - 3, box_y + box_size - 3)
+                    ],
+                    radius=2,
+                    fill=self.checked_color
+                )
+                # Draw check symbol
+                check_points = [
+                    (box_x + 5, box_y + box_size // 2),
+                    (box_x + box_size // 2 - 1, box_y + box_size - 6),
+                    (box_x + box_size - 4, box_y + 5)
+                ]
+                d.line(check_points, fill="#0f0f23", width=2)
+            
+            # Wrap text for long items
+            wrapped_lines = textwrap.wrap(item_text, width=int(char_per_line), break_long_words=False)
+            text_x = box_x + box_size + 15
+            
+            # Use strikethrough color for checked items
+            text_color = self.unchecked_color if is_checked else self.text_color
+            
+            for line in wrapped_lines:
+                d.text(
+                    (text_x, current_height),
+                    line,
+                    fill=text_color,
+                    font=font,
+                )
+                current_height += int(font.font.height * 1.4)
+            
+            current_height += 8  # Extra spacing between items
+        
+        return img, int(current_height + 15)
