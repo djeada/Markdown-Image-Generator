@@ -217,6 +217,8 @@ Before installing the Markdown Image Generator, ensure your system meets the fol
 - **pip**: Python package installer (usually included with Python)
 - **Git**: For cloning the repository ([Download Git](https://git-scm.com/downloads))
 
+> **Note**: While the minimum requirement is Python 3.8, we recommend Python 3.9+ for optimal performance.
+
 ### Method 1: Installation via pip (Recommended)
 
 Install directly from the repository:
@@ -230,6 +232,8 @@ After installation, you can use the tool via the command line:
 ```bash
 md-image-generator yourfile.md -o output_folder
 ```
+
+> **Note**: If the `md-image-generator` command is not found after installation, you can alternatively run: `python -m src.main yourfile.md -o output_folder`
 
 ### Method 2: Installation from Source
 
@@ -355,18 +359,29 @@ Customize the color scheme for your images:
 ```json
 {
   "COLORS": {
-    "TEXT": "#FFFFFF",           // Main text color
-    "BACKGROUND": "#000000",      // Background color
-    "HIGHLIGHT": "#ffab00",       // Bold text and highlights
-    "ITALIC_COLOR": "#e0e0e0",    // Italic text color
-    "LINK_COLOR": "#5dade2",      // Hyperlink color
-    "BULLET_COLOR": "#ffab00",    // Bullet point color
-    "NUMBER_COLOR": "#ffab00",    // Numbered list color
-    "QUOTE_COLOR": "#CCCCCC",     // Blockquote text color
-    "DIVIDER_COLOR": "#555555"    // Horizontal rule color
+    "TEXT": "#FFFFFF",
+    "BACKGROUND": "#000000",
+    "HIGHLIGHT": "#ffab00",
+    "ITALIC_COLOR": "#e0e0e0",
+    "LINK_COLOR": "#5dade2",
+    "BULLET_COLOR": "#ffab00",
+    "NUMBER_COLOR": "#ffab00",
+    "QUOTE_COLOR": "#CCCCCC",
+    "DIVIDER_COLOR": "#555555"
   }
 }
 ```
+
+**Color Options Explained:**
+- `TEXT`: Main text color
+- `BACKGROUND`: Background color (overridden if gradient is enabled)
+- `HIGHLIGHT`: Bold text and highlights
+- `ITALIC_COLOR`: Italic text color
+- `LINK_COLOR`: Hyperlink color
+- `BULLET_COLOR`: Bullet point color
+- `NUMBER_COLOR`: Numbered list color
+- `QUOTE_COLOR`: Blockquote text color
+- `DIVIDER_COLOR`: Horizontal rule color
 
 #### Gradient Backgrounds
 
@@ -378,12 +393,17 @@ Enable modern gradient backgrounds for a professional look:
     "NAME": "dark",
     "GRADIENT": {
       "ENABLED": true,
-      "START_COLOR": "#1a1a2e",   // Gradient start color
-      "END_COLOR": "#16213e"       // Gradient end color
+      "START_COLOR": "#1a1a2e",
+      "END_COLOR": "#16213e"
     }
   }
 }
 ```
+
+**Gradient Options:**
+- `ENABLED`: Set to `true` to enable gradient, `false` for solid background
+- `START_COLOR`: Gradient start color (top)
+- `END_COLOR`: Gradient end color (bottom)
 
 #### Page Layout Configuration
 
@@ -392,18 +412,29 @@ Control image dimensions and margins:
 ```json
 {
   "PAGE_LAYOUT": {
-    "TOP_MARGIN": 250,          // Top margin in pixels
-    "BOTTOM_MARGIN": 250,       // Bottom margin in pixels
-    "RIGHT_MARGIN": 80,         // Right margin in pixels
-    "IMAGE_WIDTH": 1080,        // Image width in pixels (Instagram-friendly)
-    "IMAGE_HEIGHT": 1080,       // Image height in pixels
-    "CHAR_WIDTH": 15,           // Character width for text wrapping
-    "DEFAULT_LINE_HEIGHT": 30,  // Line height for paragraphs
-    "LIST_LINE_HEIGHT": 20,     // Line height for list items
-    "START_INDEX": 0            // Starting index for image numbering
+    "TOP_MARGIN": 250,
+    "BOTTOM_MARGIN": 250,
+    "RIGHT_MARGIN": 80,
+    "IMAGE_WIDTH": 1080,
+    "IMAGE_HEIGHT": 1080,
+    "CHAR_WIDTH": 15,
+    "DEFAULT_LINE_HEIGHT": 30,
+    "LIST_LINE_HEIGHT": 20,
+    "START_INDEX": 0
   }
 }
 ```
+
+**Layout Options:**
+- `TOP_MARGIN`: Top margin in pixels
+- `BOTTOM_MARGIN`: Bottom margin in pixels
+- `RIGHT_MARGIN`: Right margin in pixels
+- `IMAGE_WIDTH`: Image width in pixels (1080 is Instagram-friendly)
+- `IMAGE_HEIGHT`: Image height in pixels
+- `CHAR_WIDTH`: Character width for text wrapping calculations
+- `DEFAULT_LINE_HEIGHT`: Line height for paragraphs
+- `LIST_LINE_HEIGHT`: Line height for list items
+- `START_INDEX`: Starting index for image numbering
 
 #### Code Block Styling
 
@@ -412,13 +443,19 @@ Customize code block appearance:
 ```json
 {
   "CODE_BLOCK": {
-    "SCALE_FACTOR": 2,          // Scaling for code text
-    "BACKGROUND": "#1e1e1e",    // Code block background color
-    "RADIUS": 20,               // Corner radius in pixels
-    "TOP_PADDING": 50           // Top padding in pixels
+    "SCALE_FACTOR": 2,
+    "BACKGROUND": "#1e1e1e",
+    "RADIUS": 20,
+    "TOP_PADDING": 50
   }
 }
 ```
+
+**Code Block Options:**
+- `SCALE_FACTOR`: Scaling multiplier for code text size
+- `BACKGROUND`: Code block background color
+- `RADIUS`: Corner radius in pixels for rounded corners
+- `TOP_PADDING`: Top padding in pixels
 
 #### Table Styling
 
@@ -428,15 +465,24 @@ Configure table rendering:
 {
   "TABLE": {
     "SCALE_FACTOR": 1,
-    "FOREGROUND": "#FFFFFF",      // Table text color
-    "BACKGROUND": "#292929",      // Table background
-    "HIGHLIGHT": "#ffab00",       // Table borders/highlights
-    "HEADER_BG_COLOR": "#8c52ff", // Header background
-    "HEADER_FG_COLOR": "#FFFFFF", // Header text color
-    "HEIGHT": 8                   // Row height multiplier
+    "FOREGROUND": "#FFFFFF",
+    "BACKGROUND": "#292929",
+    "HIGHLIGHT": "#ffab00",
+    "HEADER_BG_COLOR": "#8c52ff",
+    "HEADER_FG_COLOR": "#FFFFFF",
+    "HEIGHT": 8
   }
 }
 ```
+
+**Table Options:**
+- `SCALE_FACTOR`: Scaling multiplier for table text
+- `FOREGROUND`: Table text color
+- `BACKGROUND`: Table cell background
+- `HIGHLIGHT`: Table borders and highlights
+- `HEADER_BG_COLOR`: Header row background color
+- `HEADER_FG_COLOR`: Header row text color
+- `HEIGHT`: Row height multiplier
 
 ### Pre-built Themes
 
@@ -619,9 +665,11 @@ We welcome contributions from the community! Whether you're fixing bugs, adding 
 
 1. **Fork and clone the repository**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Markdown-Image-Generator.git
+   git clone https://github.com/<YOUR_USERNAME>/Markdown-Image-Generator.git
    cd Markdown-Image-Generator
    ```
+   
+   > Replace `<YOUR_USERNAME>` with your GitHub username
 
 2. **Create a virtual environment**:
    ```bash
