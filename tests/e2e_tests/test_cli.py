@@ -1,27 +1,7 @@
 import os
 import pytest
 from pathlib import Path
-from tests.test_utils import run_as_module
-
-
-def _playwright_browsers_available() -> bool:
-    """Return True only if Playwright *and* a Chromium browser are installed."""
-    try:
-        from playwright.sync_api import sync_playwright
-
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            browser.close()
-        return True
-    except Exception:
-        return False
-
-
-_has_playwright = _playwright_browsers_available()
-requires_playwright = pytest.mark.skipif(
-    not _has_playwright,
-    reason="Playwright browsers not installed (run 'playwright install chromium')",
-)
+from tests.test_utils import run_as_module, requires_playwright
 
 
 pytestmark = [
@@ -159,8 +139,6 @@ def test_pil_renderer_conversion(temp_markdown_file, tmp_path):
         "--renderer", "pil",
         "--no-show",
     )
-    print(f"\nstdout: {result.stdout}")
-    print(f"stderr: {result.stderr}")
     assert result.returncode == 0
 
     output_files = list(output_dir.glob("*.png"))
@@ -197,8 +175,6 @@ def test_preset_flag(temp_markdown_file, tmp_path):
         "--preset", "instagram-square",
         "--no-show",
     )
-    print(f"\nstdout: {result.stdout}")
-    print(f"stderr: {result.stderr}")
     assert result.returncode == 0
 
     output_files = list(output_dir.glob("*.png"))

@@ -11,26 +11,7 @@ from src.rendering.base import Renderer
 from src.rendering.pil_renderer import PilRenderer
 from src.rendering.playwright_renderer import PlaywrightRenderer, _load_css_theme
 from src.utils.exceptions import ImageGenerationError
-
-
-def _playwright_browsers_available() -> bool:
-    """Return True only if Playwright *and* a Chromium browser are installed."""
-    try:
-        from playwright.sync_api import sync_playwright
-
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            browser.close()
-        return True
-    except Exception:
-        return False
-
-
-_has_playwright = _playwright_browsers_available()
-requires_playwright = pytest.mark.skipif(
-    not _has_playwright,
-    reason="Playwright browsers not installed (run 'playwright install chromium')",
-)
+from tests.test_utils import requires_playwright
 
 
 # -- Renderer ABC -------------------------------------------------------------
