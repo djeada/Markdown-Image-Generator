@@ -1,0 +1,266 @@
+/* ==========================================================================
+   Corporate Deck Theme
+   Professional presentation style — navy blue headers, clean white
+   background, conservative design suitable for business contexts.
+   ========================================================================== */
+
+/* --- Base / Body ---
+   White background with professional dark text. */
+body {
+    background: #ffffff;
+    color: #333333;
+    font-family: 'CustomFont', 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+    font-size: 26px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Title Slide ---
+   Light warm gray for a clean, corporate feel. */
+.title-slide {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
+}
+
+/* --- Title (h1) ---
+   Navy blue, authoritative. */
+h1.title {
+    font-size: 64px;
+    font-weight: 800;
+    color: #1a2744;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+/* --- Section Headers (h2) ---
+   Navy with a subtle bottom border accent. */
+h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a2744;
+    margin: 26px 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #0066cc;
+}
+
+/* --- Paragraphs --- */
+p {
+    margin: 12px 0;
+    color: #444444;
+}
+
+/* --- Inline Emphasis --- */
+strong {
+    color: #0066cc;
+    font-weight: 700;
+}
+
+em {
+    color: #666666;
+    font-style: italic;
+}
+
+/* --- Links ---
+   Corporate blue, professional underline. */
+a {
+    color: #0066cc;
+    text-decoration: none;
+    border-bottom: 1px solid #0066cc60;
+}
+
+/* --- Strikethrough --- */
+del {
+    color: #aaaaaa;
+    text-decoration: line-through;
+}
+
+/* --- Inline Code ---
+   Light blue-gray pill. */
+code.inline {
+    background: #eef2f7;
+    color: #1a2744;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+}
+
+/* --- Code Blocks ---
+   Navy background for contrast, clean presentation. */
+.code-block {
+    background: #1a2744;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #e8ecf1;
+}
+
+/* --- Unordered Lists ---
+   Clean blue arrow bullet. */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #0066cc;
+    font-weight: bold;
+}
+
+/* --- Ordered Lists ---
+   Blue numbered circles. */
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 6px 0 6px 40px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: #0066cc;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 8px;
+}
+
+/* --- Blockquotes ---
+   Blue left border with light tinted background. */
+blockquote {
+    border-left: 4px solid #0066cc;
+    background: #f0f5fa;
+    padding: 16px 24px;
+    margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: #555555;
+    font-style: italic;
+}
+
+/* --- Horizontal Rules ---
+   Simple corporate blue fade. */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, #0066cc, #e0e0e0);
+    margin: 26px 0;
+}
+
+/* --- Tables ---
+   Professional with alternating rows and clear grid. */
+.table-wrapper {
+    margin: 16px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #d0d5dd;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 22px;
+}
+
+thead tr {
+    background: #1a2744;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e4e7ec;
+    color: #444444;
+}
+
+/* Alternating row colors for readability */
+tbody tr:nth-child(even) {
+    background: #f4f5f7;
+}
+
+tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+/* --- Task Lists --- */
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 6px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.task.checked {
+    color: #0066cc;
+}
+
+.task.unchecked {
+    color: #aaaaaa;
+}
+
+/* --- Page Number ---
+   Navy badge, white text. */
+.page-number {
+    background: #1a2744;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* --- Decorative: Bottom accent bar ---
+   A thin corporate-blue stripe along the bottom edge. */
+.slide::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0066cc 0%, #0066cc 60%, #e0e0e0 100%);
+}

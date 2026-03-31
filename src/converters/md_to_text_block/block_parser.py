@@ -2,10 +2,11 @@ from src.data.text_block import TextBlock
 
 from abc import ABC, abstractmethod
 import re
+from typing import List, Optional, Tuple
 
 
 class BlockParser(ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.reset()
 
     @abstractmethod
@@ -17,7 +18,7 @@ class BlockParser(ABC):
         pass
 
     @abstractmethod
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         pass
 
     @abstractmethod
@@ -25,14 +26,14 @@ class BlockParser(ABC):
         pass
 
     @abstractmethod
-    def reset(self):
+    def reset(self) -> None:
         pass
 
 
 class TitleParser(BlockParser):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.content = ""
+        self.content: str = ""
 
     def is_start_line(self, line: str) -> bool:
         stripped_line = line.strip()
@@ -52,7 +53,7 @@ class TitleParser(BlockParser):
         self.content = ""
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
 
 
@@ -68,11 +69,11 @@ class HeaderParser(TitleParser):
 
 
 class CodeBlockParser(BlockParser):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.is_parsing = False
-        self.content = []
-        self.counter = 0
+        self.is_parsing: bool = False
+        self.content: List[str] = []
+        self.counter: int = 0
 
     def is_start_line(self, line: str) -> bool:
         stripped_line = line.strip()
@@ -93,7 +94,7 @@ class CodeBlockParser(BlockParser):
                 self.counter += 1
         return False
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         if not self.is_parsing:
             return
 
@@ -106,7 +107,7 @@ class CodeBlockParser(BlockParser):
         self.content = []
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
 
 
@@ -117,23 +118,23 @@ class TableBlockParser(BlockParser):
     def is_end_line(self, line: str) -> bool:
         return "|" not in line
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         self.content.append(line)
 
     def get_block(self) -> TextBlock:
         return TextBlock("table", "\n".join(self.content))
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
 
 
 class BulletListParser(BlockParser):
     """Parser for unordered bullet lists (- or * prefixed items)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.content = []
-        self.is_parsing = False
+        self.content: List[str] = []
+        self.is_parsing: bool = False
 
     def is_start_line(self, line: str) -> bool:
         stripped = line.strip()
@@ -154,7 +155,7 @@ class BulletListParser(BlockParser):
             return True
         return False
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         stripped = line.strip()
         if stripped.startswith("- "):
             self.content.append(stripped[2:])
@@ -166,7 +167,7 @@ class BulletListParser(BlockParser):
         self.content = []
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
         self.is_parsing = False
 
@@ -174,10 +175,10 @@ class BulletListParser(BlockParser):
 class NumberedListParser(BlockParser):
     """Parser for ordered numbered lists (1. 2. 3. prefixed items)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.content = []
-        self.is_parsing = False
+        self.content: List[str] = []
+        self.is_parsing: bool = False
 
     def is_start_line(self, line: str) -> bool:
         stripped = line.strip()
@@ -231,7 +232,7 @@ class BlockquoteParser(BlockParser):
             return True
         return False
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         stripped = line.strip()
         if stripped.startswith("> "):
             self.content.append(stripped[2:])
@@ -243,7 +244,7 @@ class BlockquoteParser(BlockParser):
         self.content = []
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
         self.is_parsing = False
 
@@ -251,9 +252,9 @@ class BlockquoteParser(BlockParser):
 class HorizontalRuleParser(BlockParser):
     """Parser for horizontal rules (---, ***, ___)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.content = ""
+        self.content: str = ""
 
     def is_start_line(self, line: str) -> bool:
         stripped = line.strip()
@@ -270,7 +271,7 @@ class HorizontalRuleParser(BlockParser):
     def is_end_line(self, line: str) -> bool:
         return True  # Single line element
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         self.content = "---"
 
     def get_block(self) -> TextBlock:
@@ -278,17 +279,17 @@ class HorizontalRuleParser(BlockParser):
         self.content = ""
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = ""
 
 
 class TaskListParser(BlockParser):
     """Parser for task lists (- [ ] or - [x] prefixed items)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.content = []
-        self.is_parsing = False
+        self.content: List[Tuple[str, str]] = []
+        self.is_parsing: bool = False
 
     def is_start_line(self, line: str) -> bool:
         stripped = line.strip()
@@ -313,7 +314,7 @@ class TaskListParser(BlockParser):
             return True
         return False
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> None:
         stripped = line.strip()
         # Extract checked state and text
         if stripped.startswith("- [x]") or stripped.startswith("- [X]"):
@@ -332,6 +333,6 @@ class TaskListParser(BlockParser):
         self.content = []
         return block
 
-    def reset(self):
+    def reset(self) -> None:
         self.content = []
         self.is_parsing = False

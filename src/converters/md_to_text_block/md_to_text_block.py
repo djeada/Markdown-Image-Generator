@@ -23,9 +23,9 @@ class MarkdownToTextBlock:
     A class to interpret Markdown into text blocks.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.parser = SectionParser()
-        self.parsers = [
+        self.parsers: List[BlockParser] = [
             CodeBlockParser(),
             TableBlockParser(),
             TaskListParser(),  # Must come before BulletListParser
@@ -37,7 +37,7 @@ class MarkdownToTextBlock:
             TitleParser(),
         ]
 
-        self.active_parser = None
+        self.active_parser: Optional[BlockParser] = None
 
     def run(self, content: str, max_width: int = sys.maxsize) -> List[List[TextBlock]]:
         sections = self.parser.parse(content)

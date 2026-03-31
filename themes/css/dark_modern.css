@@ -1,0 +1,317 @@
+/* Dark Modern Theme — deep navy background, cyan/purple accents */
+
+body {
+    background: linear-gradient(180deg, #0f0f23 0%, #1a1a3e 100%);
+    color: #ffffff;
+    font-family: 'CustomFont', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 26px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Title slide */
+.title-slide {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 60%, #2d1b69 100%);
+}
+
+h1.title {
+    font-size: 64px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 0 40px rgba(0, 212, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 38px;
+    font-weight: 700;
+    color: #00d4ff;
+    margin: 24px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+p {
+    margin: 12px 0;
+    color: #e0e0e0;
+}
+
+strong {
+    color: #00d4ff;
+    font-weight: 700;
+}
+
+em {
+    color: #b8c0e0;
+    font-style: italic;
+}
+
+a {
+    color: #ff79c6;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 121, 198, 0.3);
+}
+
+del {
+    color: #666;
+    text-decoration: line-through;
+}
+
+/* Inline code */
+code.inline {
+    background: #282a36;
+    color: #50fa7b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Code blocks */
+.code-block {
+    background: #282a36;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #f8f8f2;
+}
+
+/* Lists */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #00d4ff;
+    font-weight: bold;
+}
+
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 6px 0 6px 40px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: #bd93f9;
+    color: #0f0f23;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 8px;
+}
+
+/* Blockquote */
+blockquote {
+    border-left: 4px solid #ff79c6;
+    background: rgba(255, 121, 198, 0.08);
+    padding: 16px 24px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+    color: #b8c0e0;
+    font-style: italic;
+}
+
+/* Horizontal rule */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #44475a, #00d4ff, #44475a, transparent);
+    margin: 24px 0;
+}
+
+/* Tables */
+.table-wrapper {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 22px;
+}
+
+thead tr {
+    background: #6272a4;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #f8f8f2;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #44475a;
+}
+
+tbody tr:nth-child(even) {
+    background: #21222c;
+}
+
+tbody tr:nth-child(odd) {
+    background: #282a36;
+}
+
+/* Task list */
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 6px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.task.checked {
+    color: #50fa7b;
+}
+
+.task.unchecked {
+    color: #888;
+}
+
+/* Page number badge */
+.page-number {
+    background: #00d4ff;
+    color: #0f0f23;
+    font-size: 16px;
+}
+
+/* Corner accents */
+.slide::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: 50px;
+    height: 2px;
+    background: #00d4ff;
+    box-shadow: 0 0 0 0 transparent, 0 48px 0 0 #00d4ff;
+}
+
+.slide::after {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: 2px;
+    height: 50px;
+    background: #00d4ff;
+}
+
+/* GitHub file cards */
+.github-file {
+    margin: 16px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    background: rgba(15, 15, 35, 0.8);
+}
+.github-file-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(0, 212, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+}
+.github-file-icon { font-size: 20px; }
+.github-file-name {
+    font-weight: 700;
+    color: #00d4ff;
+    font-size: 20px;
+    flex: 1;
+}
+.github-file-lang {
+    font-size: 14px;
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.15);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+.github-file-meta {
+    padding: 6px 20px;
+    font-size: 13px;
+    color: #8b8fa3;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.github-file .code-block {
+    margin: 0;
+    border-radius: 0;
+}
+.github-file .code-block pre {
+    margin: 0;
+    font-size: 15px;
+    max-height: 600px;
+    overflow: hidden;
+}
+.github-notes-content {
+    padding: 16px 20px;
+}
+.github-notes-content .notes-heading {
+    color: #00d4ff;
+    font-size: 22px;
+    margin: 14px 0 8px 0;
+}
+.github-notes-content p {
+    margin: 6px 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #d0d0e0;
+}
+.github-notes-content li {
+    margin: 4px 0 4px 20px;
+    color: #d0d0e0;
+    font-size: 18px;
+}

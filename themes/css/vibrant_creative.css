@@ -1,0 +1,287 @@
+/* Vibrant Creative Theme — bold gradients, warm accent colors */
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    font-family: 'CustomFont', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 26px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.title-slide {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+h1.title {
+    font-size: 64px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 0 60px rgba(255, 107, 107, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 38px;
+    font-weight: 700;
+    color: #ff6b6b;
+    margin: 24px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+}
+
+p {
+    margin: 12px 0;
+    color: #e8e8e8;
+}
+
+strong {
+    color: #ff6b6b;
+    font-weight: 700;
+}
+
+em {
+    color: #c9d1d9;
+    font-style: italic;
+}
+
+a {
+    color: #4ecdc4;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(78, 205, 196, 0.4);
+}
+
+del {
+    color: #777;
+    text-decoration: line-through;
+}
+
+code.inline {
+    background: #2d2d44;
+    color: #4ecdc4;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.code-block {
+    background: #2d2d44;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #f0f0f0;
+}
+
+ul, ol {
+    margin: 12px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 6px 0 6px 40px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: #ffe66d;
+    color: #1a1a2e;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 8px;
+}
+
+blockquote {
+    border-left: 4px solid #4ecdc4;
+    background: rgba(78, 205, 196, 0.1);
+    padding: 16px 24px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+    color: #c9d1d9;
+    font-style: italic;
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff6b6b, #ffe66d, #4ecdc4, transparent);
+    margin: 24px 0;
+}
+
+.table-wrapper {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 22px;
+}
+
+thead tr {
+    background: #ff6b6b;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #495057;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(45, 45, 68, 0.6);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(45, 45, 68, 0.3);
+}
+
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 6px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.task.checked {
+    color: #4ecdc4;
+}
+
+.task.unchecked {
+    color: #888;
+}
+
+.page-number {
+    background: #ff6b6b;
+    color: #1a1a2e;
+    font-size: 16px;
+}
+
+/* GitHub file cards */
+.github-file {
+    margin: 16px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    background: rgba(26, 26, 46, 0.85);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.github-file-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(78,205,196,0.15));
+    border-bottom: 1px solid rgba(255,107,107,0.2);
+}
+.github-file-icon { font-size: 20px; }
+.github-file-name {
+    font-weight: 700;
+    color: #ff6b6b;
+    font-size: 20px;
+    flex: 1;
+}
+.github-file-lang {
+    font-size: 14px;
+    color: #4ecdc4;
+    background: rgba(78,205,196,0.15);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+.github-file-meta {
+    padding: 6px 20px;
+    font-size: 13px;
+    color: #8b8fa3;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.github-file .code-block {
+    margin: 0;
+    border-radius: 0;
+}
+.github-file .code-block pre {
+    margin: 0;
+    font-size: 15px;
+    max-height: 600px;
+    overflow: hidden;
+}
+.github-notes-content {
+    padding: 16px 20px;
+}
+.github-notes-content .notes-heading {
+    color: #ff6b6b;
+    font-size: 22px;
+    margin: 14px 0 8px 0;
+}
+.github-notes-content p {
+    margin: 6px 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #d0d0e0;
+}
+.github-notes-content li {
+    margin: 4px 0 4px 20px;
+    color: #d0d0e0;
+    font-size: 18px;
+}

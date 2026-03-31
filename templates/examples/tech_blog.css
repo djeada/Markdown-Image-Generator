@@ -1,0 +1,290 @@
+/* ==========================================================================
+   Tech Blog Theme
+   Dark charcoal background with green terminal-inspired accents.
+   Monospace-influenced typography. GitHub dark mode meets the terminal.
+   ========================================================================== */
+
+/* --- Base / Body ---
+   Dark charcoal (not pure black) with light gray text. */
+body {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: 'CustomFont', 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    font-size: 26px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Title Slide ---
+   Slightly varied dark background for the title card. */
+.title-slide {
+    background: linear-gradient(180deg, #1e1e2e 0%, #181825 100%);
+}
+
+/* --- Title (h1) ---
+   Bright green, monospace-influenced. */
+h1.title {
+    font-size: 62px;
+    font-weight: 800;
+    color: #a6e3a1;
+    text-shadow: 0 0 30px rgba(166, 227, 161, 0.2);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+/* --- Section Headers (h2) ---
+   Green with a terminal-prompt feel. */
+h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #a6e3a1;
+    margin: 24px 0 14px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #313244;
+}
+
+/* --- Paragraphs --- */
+p {
+    margin: 12px 0;
+    color: #bac2de;
+}
+
+/* --- Inline Emphasis --- */
+strong {
+    color: #a6e3a1;
+    font-weight: 700;
+}
+
+em {
+    color: #9399b2;
+    font-style: italic;
+}
+
+/* --- Links ---
+   Bright blue, developer-doc style. */
+a {
+    color: #89b4fa;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(137, 180, 250, 0.4);
+}
+
+/* --- Strikethrough --- */
+del {
+    color: #585b70;
+    text-decoration: line-through;
+}
+
+/* --- Inline Code ---
+   Highlighted green on dark surface — the signature look. */
+code.inline {
+    background: #313244;
+    color: #a6e3a1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    border: 1px solid #45475a;
+}
+
+/* --- Code Blocks ---
+   Distinct darker surface with visible border. Terminal aesthetic. */
+.code-block {
+    background: #11111b;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+    border: 1px solid #313244;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 22px;
+    line-height: 1.55;
+    color: #cdd6f4;
+}
+
+/* --- Unordered Lists ---
+   Green arrow bullet, terminal-style. */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '›';
+    position: absolute;
+    left: 4px;
+    color: #a6e3a1;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* --- Ordered Lists ---
+   Green numbered badges on dark. */
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 6px 0 6px 40px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: #a6e3a1;
+    color: #1e1e2e;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 8px;
+}
+
+/* --- Blockquotes ---
+   Green left border with subtle tinted background. */
+blockquote {
+    border-left: 4px solid #a6e3a1;
+    background: rgba(166, 227, 161, 0.06);
+    padding: 16px 24px;
+    margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: #9399b2;
+    font-style: italic;
+}
+
+/* --- Horizontal Rules ---
+   Fading green line. */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #a6e3a1, #45475a, transparent);
+    margin: 24px 0;
+}
+
+/* --- Tables ---
+   Visible grid lines on dark surface — data-table style. */
+.table-wrapper {
+    margin: 16px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #313244;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 22px;
+}
+
+thead tr {
+    background: #313244;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #a6e3a1;
+    border-bottom: 2px solid #45475a;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 20px;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #313244;
+    color: #bac2de;
+}
+
+/* Visible vertical grid lines for a data-table feel */
+th + th,
+td + td {
+    border-left: 1px solid #313244;
+}
+
+tbody tr:nth-child(even) {
+    background: #181825;
+}
+
+tbody tr:nth-child(odd) {
+    background: #1e1e2e;
+}
+
+/* --- Task Lists --- */
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 6px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.task.checked {
+    color: #a6e3a1;
+}
+
+.task.unchecked {
+    color: #585b70;
+}
+
+/* --- Page Number ---
+   Green-on-dark badge. */
+.page-number {
+    background: #a6e3a1;
+    color: #1e1e2e;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* --- Decorative: Subtle top-left bracket ---
+   Terminal-inspired L-shaped corner accent. */
+.slide::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 36px;
+    width: 40px;
+    height: 2px;
+    background: #a6e3a1;
+    opacity: 0.5;
+}
+
+.slide::after {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 36px;
+    width: 2px;
+    height: 40px;
+    background: #a6e3a1;
+    opacity: 0.5;
+}

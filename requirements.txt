@@ -19,6 +19,9 @@ fonttools>=4.43.0
 kiwisolver>=1.4.4
 pyparsing>=3.0.9
 
+# Browser rendering
+playwright>=1.40.0
+
 # Required runtime dependencies
 packaging>=23.1
 six>=1.16.0

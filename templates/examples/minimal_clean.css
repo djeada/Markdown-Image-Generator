@@ -1,0 +1,249 @@
+/* ==========================================================================
+   Minimal Clean Theme
+   Ultra-clean, Apple-inspired minimalism. White space, system fonts,
+   no gradients, no shadows, no distractions — just content.
+   ========================================================================== */
+
+/* --- Base / Body ---
+   Pure white background with dark text. System font stack for native feel. */
+body {
+    background: #ffffff;
+    color: #1d1d1f;
+    font-family: 'CustomFont', -apple-system, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+    font-size: 26px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Title Slide ---
+   Same white background — no gradients, no effects. */
+.title-slide {
+    background: #ffffff;
+}
+
+/* --- Title (h1) ---
+   Large, heavy weight. Pure black for maximum contrast. */
+h1.title {
+    font-size: 64px;
+    font-weight: 800;
+    color: #1d1d1f;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+}
+
+/* --- Section Headers (h2) ---
+   Medium weight with a barely-there bottom border. */
+h2 {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 28px 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e5e7;
+}
+
+/* --- Paragraphs --- */
+p {
+    margin: 14px 0;
+    color: #424245;
+}
+
+/* --- Inline Emphasis --- */
+strong {
+    color: #1d1d1f;
+    font-weight: 700;
+}
+
+em {
+    color: #6e6e73;
+    font-style: italic;
+}
+
+/* --- Links ---
+   Subtle underline, no loud colors. */
+a {
+    color: #0066cc;
+    text-decoration: none;
+    border-bottom: 1px solid #0066cc40;
+}
+
+/* --- Strikethrough --- */
+del {
+    color: #aeaeb2;
+    text-decoration: line-through;
+}
+
+/* --- Inline Code ---
+   Light gray pill on white. */
+code.inline {
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    border: 1px solid #e5e5e7;
+}
+
+/* --- Code Blocks ---
+   Very light gray background — no heavy contrast. */
+.code-block {
+    background: #f5f5f7;
+    border-radius: 10px;
+    padding: 24px;
+    margin: 18px 0;
+    overflow-x: auto;
+    border: 1px solid #e5e5e7;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 21px;
+    line-height: 1.55;
+    color: #1d1d1f;
+}
+
+/* --- Unordered Lists ---
+   Minimal bullet: a small mid-dot. */
+ul, ol {
+    margin: 14px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 5px 0 5px 24px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: #aeaeb2;
+    font-size: 1.4em;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+/* --- Ordered Lists ---
+   Simple numeric counter, no colored badge. */
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 5px 0 5px 32px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter) '.';
+    position: absolute;
+    left: 0;
+    color: #aeaeb2;
+    font-size: 0.9em;
+    font-weight: 600;
+    top: 6px;
+}
+
+/* --- Blockquotes ---
+   Thin left border, muted text. */
+blockquote {
+    border-left: 3px solid #d2d2d7;
+    background: transparent;
+    padding: 12px 24px;
+    margin: 18px 0;
+    border-radius: 0;
+    color: #6e6e73;
+    font-style: italic;
+}
+
+/* --- Horizontal Rules ---
+   Hairline divider. */
+hr {
+    border: none;
+    height: 1px;
+    background: #e5e5e7;
+    margin: 28px 0;
+}
+
+/* --- Tables ---
+   Clean lines, no heavy styling. */
+.table-wrapper {
+    margin: 18px 0;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 22px;
+}
+
+thead tr {
+    background: transparent;
+    border-bottom: 2px solid #d2d2d7;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e5e5e7;
+    color: #424245;
+}
+
+tbody tr:nth-child(even) {
+    background: transparent;
+}
+
+tbody tr:nth-child(odd) {
+    background: transparent;
+}
+
+/* --- Task Lists --- */
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 5px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.1em;
+    margin-right: 8px;
+}
+
+.task.checked {
+    color: #1d1d1f;
+}
+
+.task.unchecked {
+    color: #aeaeb2;
+}
+
+/* --- Page Number ---
+   Understated gray circle. */
+.page-number {
+    background: #e5e5e7;
+    color: #6e6e73;
+    font-size: 14px;
+}

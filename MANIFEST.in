@@ -3,3 +3,4 @@ include README.md
 include requirements*.txt
 recursive-include resources *.png
 recursive-include demo *.md
+recursive-include themes *.json *.css

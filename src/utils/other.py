@@ -1,4 +1,7 @@
-def hex_to_rgba(hex_value: str):
+from typing import Tuple
+
+
+def hex_to_rgba(hex_value: str) -> Tuple[int, ...]:
     """
     Convert a hex color code to an RGBA tuple.
 

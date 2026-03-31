@@ -1,0 +1,271 @@
+/* ==========================================================================
+   Instagram Story Theme
+   Bold sunset gradient (orange → pink → purple) optimized for vertical
+   1080×1920 story format. High contrast, large type, social-media-ready.
+   ========================================================================== */
+
+/* --- Base / Body ---
+   Warm sunset gradient background with white text. */
+body {
+    background: linear-gradient(160deg, #f7971e 0%, #e84393 40%, #6c5ce7 100%);
+    color: #ffffff;
+    font-family: 'CustomFont', 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 30px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Title Slide ---
+   Deeper, richer gradient for the title card. */
+.title-slide {
+    background: linear-gradient(160deg, #f7971e 0%, #e84393 35%, #6c5ce7 70%, #4834d4 100%);
+}
+
+/* --- Title (h1) ---
+   Extra large, bold, with a warm glow shadow. */
+h1.title {
+    font-size: 72px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 60px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+/* --- Section Headers (h2) ---
+   Bright yellow for contrast against the gradient. */
+h2 {
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffeaa7;
+    margin: 28px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 3px solid rgba(255, 234, 167, 0.35);
+}
+
+/* --- Paragraphs --- */
+p {
+    margin: 14px 0;
+    color: #fff5f5;
+}
+
+/* --- Inline Emphasis --- */
+strong {
+    color: #ffeaa7;
+    font-weight: 800;
+}
+
+em {
+    color: #dfe6e9;
+    font-style: italic;
+}
+
+/* --- Links ---
+   Cyan/teal stands out against the warm gradient. */
+a {
+    color: #81ecec;
+    text-decoration: none;
+    border-bottom: 2px solid rgba(129, 236, 236, 0.4);
+}
+
+/* --- Strikethrough --- */
+del {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: line-through;
+}
+
+/* --- Inline Code ---
+   Semi-transparent dark pill. */
+code.inline {
+    background: rgba(0, 0, 0, 0.25);
+    color: #ffeaa7;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 0.88em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* --- Code Blocks ---
+   Dark frosted-glass panel with rounded corners. */
+.code-block {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 18px 0;
+    overflow-x: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(4px);
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.code-block code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 24px;
+    line-height: 1.5;
+    color: #f0f0f0;
+}
+
+/* --- Unordered Lists ---
+   Bright star bullet. */
+ul, ol {
+    margin: 14px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul > li {
+    padding: 7px 0 7px 32px;
+    position: relative;
+}
+
+ul > li::before {
+    content: '★';
+    position: absolute;
+    left: 0;
+    color: #ffeaa7;
+    font-size: 0.75em;
+    top: 10px;
+}
+
+/* --- Ordered Lists ---
+   Bright numbered circles. */
+ol {
+    counter-reset: list-counter;
+}
+
+ol > li {
+    counter-increment: list-counter;
+    padding: 7px 0 7px 44px;
+    position: relative;
+}
+
+ol > li::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    background: #ffeaa7;
+    color: #6c5ce7;
+    border-radius: 50%;
+    font-size: 17px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 8px;
+}
+
+/* --- Blockquotes ---
+   Frosted left-bordered panel. */
+blockquote {
+    border-left: 4px solid #ffeaa7;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 18px 24px;
+    margin: 18px 0;
+    border-radius: 0 14px 14px 0;
+    color: #dfe6e9;
+    font-style: italic;
+}
+
+/* --- Horizontal Rules ---
+   Bright gradient stripe. */
+hr {
+    border: none;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ffeaa7, #81ecec, #ffeaa7, transparent);
+    margin: 28px 0;
+    border-radius: 2px;
+}
+
+/* --- Tables ---
+   Semi-transparent panels with rounded wrapper. */
+.table-wrapper {
+    margin: 18px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 24px;
+}
+
+thead tr {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 800;
+    color: #ffeaa7;
+}
+
+td {
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff5f5;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* --- Task Lists --- */
+.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list li {
+    padding: 7px 0;
+}
+
+.task-list li::before {
+    display: none;
+}
+
+.task-list .checkbox {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+.task.checked {
+    color: #ffeaa7;
+}
+
+.task.unchecked {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* --- Page Number ---
+   Small bright circle. */
+.page-number {
+    background: #ffeaa7;
+    color: #6c5ce7;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+/* --- Decorative: Subtle corner glow ---
+   Adds a soft light bloom in the top-left. */
+.slide::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent 70%);
+    pointer-events: none;
+}

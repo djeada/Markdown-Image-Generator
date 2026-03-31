@@ -1,5 +1,6 @@
 import logging
-import traceback
+from functools import lru_cache
+from pathlib import Path
 from typing import List, Dict, Optional
 from PIL import Image, ImageFont, ImageDraw
 
@@ -7,7 +8,7 @@ from src.converters.block_to_background_image.block_image_factory import (
     BlockImageFactory,
 )
 from src.data.text_block import TextBlock, BlockType
-from src.image_generation.draw_strategy import (
+from src.image_generation.draw_strategies import (
     DrawDefault,
     DrawHeader,
     DrawTitle,
@@ -20,16 +21,23 @@ from src.image_generation.draw_strategy import (
     DrawTaskList,
 )
 from src.utils.config import Config
+from src.utils.exceptions import ImageGenerationError
 
 logger = logging.getLogger(__name__)
 
 
+@lru_cache(maxsize=32)
+def _cached_load_font(font_path: str, size: int) -> ImageFont.FreeTypeFont:
+    """Load a font and cache it by (path, size) to avoid redundant disk I/O."""
+    return ImageFont.truetype(font_path, size=size)
+
+
 class ImageGenerator:
-    def __init__(self):
-        self.width = Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"]
-        self.height = Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]
-        self.text_color = Config()["COLORS"]["TEXT"]
-        self.font_path = Config()["PATHS"]["FONT"]
+    def __init__(self) -> None:
+        self.width: int = Config()["PAGE_LAYOUT"]["IMAGE_WIDTH"]
+        self.height: int = Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"]
+        self.text_color: str = Config()["COLORS"]["TEXT"]
+        self.font_path: str = Config()["PATHS"]["FONT"]
 
         self.block_styles = self.initialize_block_styles()
 
@@ -114,7 +122,7 @@ class ImageGenerator:
             text_y = position_y - text_height // 2 - 4
             draw.text((text_x, text_y), page_num_str, fill=page_num_text_color, font=font)
 
-    def generate_images(self, blocks: List[TextBlock]):
+    def generate_images(self, blocks: List[TextBlock]) -> List[Image.Image]:
         images = []
         current_height = Config()["PAGE_LAYOUT"]["TOP_MARGIN"]
         current_page = 1  # start with page 1
@@ -140,7 +148,9 @@ class ImageGenerator:
             # Check if the height difference is too large
             height_difference = block_height - current_height
             if height_difference > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] * 0.8:
-                raise Exception("Block height difference exceeds allowable limit")
+                raise ImageGenerationError(
+                    "Block height difference exceeds allowable limit"
+                )
 
             if block_height > Config()["PAGE_LAYOUT"]["IMAGE_HEIGHT"] - Config()["PAGE_LAYOUT"]["BOTTOM_MARGIN"]:
                 # If the block height exceeds the limit, reset current height and increment page
@@ -169,25 +179,34 @@ class ImageGenerator:
 
     def get_font_for_block(
         self, block_type: BlockType
-    ) -> Optional[ImageFont.ImageFont]:
+    ) -> ImageFont.FreeTypeFont:
+        """Load and return the font for the given block type.
+
+        Uses an LRU cache to avoid redundant font file I/O.
+
+        Raises:
+            ImageGenerationError: If the font file cannot be loaded.
+        """
+        font_path = Path(self.font_path)
+        if not font_path.is_file():
+            raise ImageGenerationError(
+                f"Font file not found: {self.font_path}"
+            )
+
         try:
             style = self.block_styles.get(
                 block_type, self.block_styles[BlockType.PARAGRAPH]
             )
-            return ImageFont.truetype(self.font_path, size=style["font_size"])
+            return _cached_load_font(self.font_path, style["font_size"])
         except IOError as e:
-            logger.error(f"Error: The font file {self.font_path} wasn't found. {e}")
-        except KeyError as e:
-            logger.error(f"Error: The block type {block_type} isn't supported. {e}")
-
-        return None
+            raise ImageGenerationError(
+                f"Cannot load font file {self.font_path}: {e}"
+            ) from e
 
     def draw_text_on_image(
         self, img: Image, block: TextBlock, current_height: int
     ) -> int:
         font = self.get_font_for_block(BlockType[block.type.upper()])
-        if not font:
-            return 0
 
         strategies = {
             BlockType.PARAGRAPH: DrawDefault(self.text_color),
@@ -213,8 +232,6 @@ class ImageGenerator:
             )
             return block_height
         except Exception as e:
-            error_message = (
-                f"Error drawing text on image: {e}\n{traceback.format_exc()}"
-            )
-            logger.error(error_message)
-            return 0
+            raise ImageGenerationError(
+                f"Error drawing {block.type} block on image: {e}"
+            ) from e
