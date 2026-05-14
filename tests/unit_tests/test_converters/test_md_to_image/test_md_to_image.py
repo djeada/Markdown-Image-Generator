@@ -35,11 +35,22 @@ class TestMarkdownToImageConverter:
 
     def test_get_renderer_falls_back_to_pil(self):
         with patch(
-            "src.rendering.playwright_renderer.PlaywrightRenderer",
-            side_effect=Exception("no browser"),
-        ), patch(
-            "src.rendering.pil_renderer.ImageGenerator",
-        ):
+            "src.converters.md_to_image.md_to_image.playwright_runtime_available",
+            return_value=False,
+        ), patch("src.rendering.pil_renderer.ImageGenerator"):
             converter = MarkdownToImageConverter(input_file="dummy.md")
             renderer = converter._get_renderer()
             assert renderer.name == "pil"
+
+    def test_get_renderer_does_not_swallow_playwright_initialization_errors(self):
+        with patch(
+            "src.converters.md_to_image.md_to_image.playwright_runtime_available",
+            return_value=True,
+        ), patch(
+            "src.rendering.playwright_renderer.PlaywrightRenderer",
+            side_effect=RuntimeError("broken renderer"),
+        ):
+            converter = MarkdownToImageConverter(input_file="dummy.md")
+
+            with pytest.raises(RuntimeError, match="broken renderer"):
+                converter._get_renderer()

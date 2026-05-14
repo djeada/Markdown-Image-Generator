@@ -1,12 +1,14 @@
 import itertools
 import logging
 from typing import List, Optional
+
 from PIL import Image
 
 from src.converters.md_to_text_block.github_inliner import inline_github_urls
 from src.converters.md_to_text_block.md_to_text_block import MarkdownToTextBlock
 from src.input_output.markdown_reader import MarkdownReader
 from src.rendering.base import Renderer
+from src.rendering.playwright_renderer import playwright_runtime_available
 
 logger = logging.getLogger(__name__)
 
@@ -28,14 +30,18 @@ class MarkdownToImageConverter:
         """Resolve the renderer, lazily importing to avoid heavy deps at import time."""
         if self._renderer is not None:
             return self._renderer
-        # Default: try Playwright, fall back to PIL
-        try:
-            from src.rendering.playwright_renderer import PlaywrightRenderer
-            return PlaywrightRenderer()
-        except Exception:
+
+        if not playwright_runtime_available():
             from src.rendering.pil_renderer import PilRenderer
-            logger.info("Playwright unavailable, falling back to PIL renderer")
+
+            logger.warning(
+                "Playwright runtime unavailable; falling back to PIL renderer"
+            )
             return PilRenderer()
+
+        from src.rendering.playwright_renderer import PlaywrightRenderer
+
+        return PlaywrightRenderer()
 
     def convert(self) -> List[Image.Image]:
         """

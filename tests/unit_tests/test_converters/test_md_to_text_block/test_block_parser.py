@@ -61,6 +61,8 @@ def task_list_parser():
 
 def test_title_parser(title_parser):
     assert title_parser.is_start_line("# This is a title")
+    assert title_parser.is_start_line("#Title without space")
+    assert not title_parser.is_start_line("## This is a header")
     assert not title_parser.is_start_line("This is not a title")
 
     assert title_parser.is_end_line("# This is a title")
@@ -71,9 +73,16 @@ def test_title_parser(title_parser):
     assert block.type == "title"
     assert block.data == "This is a title"
 
+    assert title_parser.parse("#Title without space")
+    block = title_parser.get_block()
+    assert block.data == "Title without space"
+
 
 def test_header_parser(header_parser):
     assert header_parser.is_start_line("## This is a header")
+    assert header_parser.is_start_line("### Nested header")
+    assert header_parser.is_start_line("##Header without space")
+    assert not header_parser.is_start_line("# This is a title")
     assert not header_parser.is_start_line("This is not a header")
 
     assert header_parser.is_end_line("## This is a header")
@@ -83,6 +92,10 @@ def test_header_parser(header_parser):
     assert isinstance(block, TextBlock)
     assert block.type == "header"
     assert block.data == "This is a header"
+
+    assert header_parser.parse("##Header without space")
+    block = header_parser.get_block()
+    assert block.data == "Header without space"
 
 
 def test_code_block_parser(code_block_parser):

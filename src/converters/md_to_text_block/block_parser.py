@@ -31,20 +31,22 @@ class BlockParser(ABC):
 
 
 class TitleParser(BlockParser):
+    _TITLE_RE = re.compile(r"^#(?!#)\s*(?P<content>.*)$")
+
     def __init__(self) -> None:
         super().__init__()
         self.content: str = ""
 
     def is_start_line(self, line: str) -> bool:
-        stripped_line = line.strip()
-        return stripped_line.startswith("#")
+        return bool(self._TITLE_RE.match(line.strip()))
 
     def is_end_line(self, line: str) -> bool:
         return True  # The header is only one line, so we end as soon as we start.
 
     def parse(self, line: str) -> bool:
-        if self.is_start_line(line):
-            self.content = line.split(" ", 1)[1].strip()
+        match = self._TITLE_RE.match(line.strip())
+        if match:
+            self.content = match.group("content").strip()
             return True
         return False
 
@@ -54,13 +56,21 @@ class TitleParser(BlockParser):
         return block
 
     def reset(self) -> None:
-        self.content = []
+        self.content = ""
 
 
 class HeaderParser(TitleParser):
+    _HEADER_RE = re.compile(r"^##+\s*(?P<content>.*)$")
+
     def is_start_line(self, line: str) -> bool:
-        stripped_line = line.strip()
-        return stripped_line.startswith("##")
+        return bool(self._HEADER_RE.match(line.strip()))
+
+    def parse(self, line: str) -> bool:
+        match = self._HEADER_RE.match(line.strip())
+        if match:
+            self.content = match.group("content").strip()
+            return True
+        return False
 
     def get_block(self) -> TextBlock:
         block = TextBlock("header", self.content)

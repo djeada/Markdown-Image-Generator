@@ -1,14 +1,15 @@
 {
     "PATHS": {
-        "DEFAULT_PAGE": "../resources/page.png",
-        "TITLE_PAGE": "../resources/intro.png",
-        "FINAL_PAGE": "../resources/final.png",
-        "QUESTION_PAGE": "../resources/challenge.png",
+        "DEFAULT_PAGE": "resources/page.png",
+        "TITLE_PAGE": "resources/intro.png",
+        "FINAL_PAGE": "resources/final.png",
+        "QUESTION_PAGE": "resources/page.png",
         "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     },
     "PAGE_LAYOUT": {
         "TOP_MARGIN": 250,
         "BOTTOM_MARGIN": 250,
+        "LEFT_MARGIN": 80,
         "RIGHT_MARGIN": 80,
         "IMAGE_WIDTH": 1080,
         "IMAGE_HEIGHT": 1080,

@@ -65,14 +65,15 @@ def test_config_file_usage(temp_markdown_file, tmp_path):
     config_file = tmp_path / "test_config.json"
     config_file.write_text("""{
         "PATHS": {
-            "DEFAULT_PAGE": "../resources/page.png",
-            "TITLE_PAGE": "../resources/intro.png",
-            "FINAL_PAGE": "../resources/final.png",
-            "QUESTION_PAGE": "../resources/challenge.png",
+            "DEFAULT_PAGE": "resources/page.png",
+            "TITLE_PAGE": "resources/intro.png",
+            "FINAL_PAGE": "resources/final.png",
+            "QUESTION_PAGE": "resources/page.png",
             "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
         },
         "PAGE_LAYOUT": {
             "TOP_MARGIN": 200,
+            "LEFT_MARGIN": 60,
             "RIGHT_MARGIN": 60,
             "IMAGE_WIDTH": 1080,
             "IMAGE_HEIGHT": 1080,
@@ -222,3 +223,21 @@ def test_invalid_preset_flag(temp_markdown_file, tmp_path):
         "--no-show",
     )
     assert result.returncode != 0
+
+
+def test_invalid_config_fails_cleanly(tmp_path):
+    """Test that invalid config exits cleanly with a validation error."""
+    md_file = tmp_path / "test.md"
+    md_file.write_text("# Title\n\nBody\n")
+    config_file = tmp_path / "bad_config.json"
+    config_file.write_text("{}")
+
+    result = run_as_module(
+        str(md_file),
+        "-c",
+        str(config_file),
+        "--no-show",
+    )
+
+    assert result.returncode != 0
+    assert "Invalid configuration:" in result.stderr

@@ -103,7 +103,7 @@ def apply_theme(config: Any, theme_name: str, themes_dir: Optional[Path] = None)
         existing = config.get(section, {})
         if isinstance(existing, dict) and isinstance(values, dict):
             existing.update(values)
-            config.set(section, existing)
+            config.set(section, existing, persist=False)
         else:
-            config.set(section, values)
+            config.set(section, values, persist=False)
     logger.info("Applied theme '%s'", theme_name)

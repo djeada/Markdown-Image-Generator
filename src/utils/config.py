@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 from pathlib import Path
@@ -6,15 +7,45 @@ from typing import Any, Callable, Dict, Iterator, Optional, Set, Type
 from src.utils.exceptions import ConfigValidationError
 
 logger = logging.getLogger(__name__)
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resource_path(filename: str) -> str:
+    return str(_PROJECT_ROOT / "resources" / filename)
+
+
+def _default_font_path() -> str:
+    for candidate in (
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+    ):
+        if Path(candidate).is_file():
+            return candidate
+    return "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 # Required top-level sections and their mandatory keys
 _REQUIRED_SECTIONS: Dict[str, Set[str]] = {
     "PATHS": {"FONT"},
-    "PAGE_LAYOUT": {"TOP_MARGIN", "BOTTOM_MARGIN", "RIGHT_MARGIN", "IMAGE_WIDTH", "IMAGE_HEIGHT"},
+    "PAGE_LAYOUT": {
+        "TOP_MARGIN",
+        "BOTTOM_MARGIN",
+        "LEFT_MARGIN",
+        "RIGHT_MARGIN",
+        "IMAGE_WIDTH",
+        "IMAGE_HEIGHT",
+    },
     "COLORS": {"TEXT", "HIGHLIGHT"},
     "CODE_BLOCK": {"SCALE_FACTOR", "BACKGROUND", "RADIUS", "TOP_PADDING"},
-    "TABLE": {"SCALE_FACTOR", "FOREGROUND", "BACKGROUND", "HIGHLIGHT",
-              "HEADER_BG_COLOR", "HEADER_FG_COLOR", "HEIGHT"},
+    "TABLE": {
+        "SCALE_FACTOR",
+        "FOREGROUND",
+        "BACKGROUND",
+        "HIGHLIGHT",
+        "HEADER_BG_COLOR",
+        "HEADER_FG_COLOR",
+        "HEIGHT",
+    },
 }
 
 
@@ -35,15 +66,16 @@ class Config:
     # Default configuration values
     _default_values: Dict[str, Any] = {
         "PATHS": {
-            "DEFAULT_PAGE": "../resources/page.png",
-            "TITLE_PAGE": "../resources/intro.png",
-            "FINAL_PAGE": "../resources/final.png",
-            "QUESTION_PAGE": "../resources/challenge.png",
-            "FONT": "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+            "DEFAULT_PAGE": _resource_path("page.png"),
+            "TITLE_PAGE": _resource_path("intro.png"),
+            "FINAL_PAGE": _resource_path("final.png"),
+            "QUESTION_PAGE": _resource_path("page.png"),
+            "FONT": _default_font_path(),
         },
         "PAGE_LAYOUT": {
             "TOP_MARGIN": 250,
             "BOTTOM_MARGIN": 250,
+            "LEFT_MARGIN": 80,
             "RIGHT_MARGIN": 80,
             "IMAGE_WIDTH": 1080,
             "IMAGE_HEIGHT": 1080,
@@ -123,12 +155,16 @@ class Config:
         with self._config_file.open("w") as file:
             json.dump(self._config_data, file, indent=4)
 
+    def save(self) -> None:
+        self._save_config()
+
     def get(self, key: str, default: Any = None) -> Any:
         return self._config_data.get(key, default)
 
-    def set(self, key: str, value: Any) -> None:
+    def set(self, key: str, value: Any, persist: bool = False) -> None:
         self._config_data[key] = value
-        self._save_config()
+        if persist:
+            self._save_config()
 
     def __getitem__(self, key: str) -> Any:
         try:
@@ -138,14 +174,15 @@ class Config:
 
     def __setitem__(self, key: str, value: Any) -> None:
         self._config_data[key] = value
-        self._save_config()
 
     def __contains__(self, key: object) -> bool:
         return key in self._config_data
 
     def __delitem__(self, key: str) -> None:
         del self._config_data[key]
-        self._save_config()
 
     def __iter__(self) -> Iterator[str]:
         return iter(self._config_data)
+
+    def reset_to_defaults(self) -> None:
+        self._config_data = copy.deepcopy(self._default_values)

@@ -66,6 +66,7 @@ def test_apply_theme_merges(tmp_path, themes_dir):
         "COLORS": {"TEXT": "#000000", "HIGHLIGHT": "#ffffff", "EXTRA": "#aaa"},
         "PATHS": {"FONT": "/some/font.ttf"},
     }))
+    original_contents = config_path.read_text()
     Config().init_config(path=config_path)
     apply_theme(Config(), "alpha", themes_dir)
 
@@ -74,6 +75,7 @@ def test_apply_theme_merges(tmp_path, themes_dir):
     assert Config()["COLORS"]["HIGHLIGHT"] == "#222222"
     # Non-theme values preserved
     assert Config()["COLORS"]["EXTRA"] == "#aaa"
+    assert config_path.read_text() == original_contents
 
 
 def test_exception_hierarchy():

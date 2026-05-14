@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "markdown-image-generator"
@@ -56,6 +56,9 @@ md-image-generator = "src.main:main"
 
 [tool.setuptools.packages.find]
 include = ["src*"]
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.package-data]
 "*" = ["resources/*.png"]

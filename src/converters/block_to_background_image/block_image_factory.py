@@ -10,12 +10,15 @@ from src.utils.other import hex_to_rgba
 class BlockImageFactory:
     _config: Config = Config()
 
-    PATHS_TO_IMAGES: dict = {
-        BackgroundImageType.TITLE: _config["PATHS"]["TITLE_PAGE"],
-        BackgroundImageType.NORMAL: _config["PATHS"]["DEFAULT_PAGE"],
-        BackgroundImageType.FINAL: _config["PATHS"]["FINAL_PAGE"],
-        BackgroundImageType.QUESTION: _config["PATHS"]["QUESTION_PAGE"],
-    }
+    @classmethod
+    def _background_paths(cls) -> dict:
+        paths = cls._config["PATHS"]
+        return {
+            BackgroundImageType.TITLE: paths["TITLE_PAGE"],
+            BackgroundImageType.NORMAL: paths["DEFAULT_PAGE"],
+            BackgroundImageType.FINAL: paths["FINAL_PAGE"],
+            BackgroundImageType.QUESTION: paths["QUESTION_PAGE"],
+        }
 
     @classmethod
     def _create_gradient_image(cls, width: int, height: int) -> Image.Image:
@@ -135,7 +138,7 @@ class BlockImageFactory:
         cls, block_type_str: str, width: int, height: int
     ) -> Image.Image:
         block_type = cls._translate_block_type(block_type_str)
-        bg_image_path = cls.PATHS_TO_IMAGES.get(block_type)
+        bg_image_path = cls._background_paths().get(block_type)
 
         # Check if gradient is enabled
         theme_config = cls._config.get("THEME", {})

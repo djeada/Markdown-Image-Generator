@@ -25,15 +25,16 @@ def valid_config_file(tmp_path):
     """Create a valid config JSON file."""
     config = {
         "PATHS": {
-            "DEFAULT_PAGE": "../resources/page.png",
-            "TITLE_PAGE": "../resources/intro.png",
-            "FINAL_PAGE": "../resources/final.png",
-            "QUESTION_PAGE": "../resources/challenge.png",
+            "DEFAULT_PAGE": "resources/page.png",
+            "TITLE_PAGE": "resources/intro.png",
+            "FINAL_PAGE": "resources/final.png",
+            "QUESTION_PAGE": "resources/page.png",
             "FONT": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         },
         "PAGE_LAYOUT": {
             "TOP_MARGIN": 250,
             "BOTTOM_MARGIN": 250,
+            "LEFT_MARGIN": 80,
             "RIGHT_MARGIN": 80,
             "IMAGE_WIDTH": 1080,
             "IMAGE_HEIGHT": 1080,
@@ -98,7 +99,14 @@ def test_config_validate_missing_key(tmp_path):
     # Has all sections but missing FONT key in PATHS
     incomplete = {
         "PATHS": {},
-        "PAGE_LAYOUT": {"TOP_MARGIN": 1, "BOTTOM_MARGIN": 1, "RIGHT_MARGIN": 1, "IMAGE_WIDTH": 1, "IMAGE_HEIGHT": 1},
+        "PAGE_LAYOUT": {
+            "TOP_MARGIN": 1,
+            "BOTTOM_MARGIN": 1,
+            "LEFT_MARGIN": 1,
+            "RIGHT_MARGIN": 1,
+            "IMAGE_WIDTH": 1,
+            "IMAGE_HEIGHT": 1,
+        },
         "COLORS": {"TEXT": "#FFF", "HIGHLIGHT": "#FFF"},
         "CODE_BLOCK": {"SCALE_FACTOR": 1, "BACKGROUND": "#000", "RADIUS": 1, "TOP_PADDING": 1},
         "TABLE": {"SCALE_FACTOR": 1, "FOREGROUND": "#FFF", "BACKGROUND": "#000",
@@ -154,3 +162,5 @@ def test_config_creates_defaults_when_missing(tmp_path):
     data = json.loads(config_path.read_text())
     assert "PATHS" in data
     assert "COLORS" in data
+    assert data["PATHS"]["FONT"]
+    assert data["PAGE_LAYOUT"]["LEFT_MARGIN"] == 80

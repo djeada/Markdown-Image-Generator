@@ -7,13 +7,53 @@ from typing import Optional
 from src.converters.md_to_image.md_to_image import MarkdownToImageConverter
 from src.converters.batch_converter import BatchConverter
 from src.input_output.image_saver import ImageSaver
+from src.rendering.base import Renderer
 from src.utils.config import Config
-from src.utils.exceptions import MarkdownImageGeneratorError
+from src.utils.exceptions import ConfigValidationError, MarkdownImageGeneratorError
 from src.utils.presets import get_preset, list_presets
 from src.utils.theme_loader import apply_theme, list_themes
 
 VERSION = "0.1.0"
 logger = logging.getLogger(__name__)
+
+
+def build_renderer(
+    renderer_name: Optional[str],
+    theme: Optional[str],
+    font_path: Optional[str],
+    width: Optional[int],
+    height: Optional[int],
+    custom_css: Optional[str],
+) -> Renderer:
+    from src.rendering.pil_renderer import PilRenderer
+    from src.rendering.playwright_renderer import (
+        PlaywrightRenderer,
+        playwright_runtime_available,
+    )
+
+    if renderer_name == "pil":
+        return PilRenderer()
+
+    if renderer_name == "playwright":
+        return PlaywrightRenderer(
+            theme=theme,
+            font_path=font_path,
+            width=width,
+            height=height,
+            custom_css=custom_css,
+        )
+
+    if playwright_runtime_available():
+        return PlaywrightRenderer(
+            theme=theme,
+            font_path=font_path,
+            width=width,
+            height=height,
+            custom_css=custom_css,
+        )
+
+    logger.warning("Playwright runtime unavailable; falling back to PIL renderer")
+    return PilRenderer()
 
 
 class CommandLineInterface:
@@ -92,8 +132,9 @@ class CommandLineInterface:
             "--renderer",
             dest="renderer",
             choices=["playwright", "pil"],
-            default="playwright",
-            help="Rendering backend: 'playwright' (default, CSS-based) or 'pil' (legacy PIL).",
+            default=None,
+            help="Rendering backend: auto (default, prefers Playwright with PIL fallback), "
+            "'playwright' (CSS-based), or 'pil' (legacy PIL).",
         )
         parser.add_argument(
             "-f",
@@ -161,15 +202,22 @@ def main() -> int:
         print("Error: input_file is required (unless using --list-themes or --list-presets).", file=sys.stderr)
         return 1
 
+    config = Config()
     if cli.args.config_path:
-        Config().init_config(path=Path(cli.args.config_path))
+        config.init_config(path=Path(cli.args.config_path))
 
     if cli.args.theme:
         try:
-            apply_theme(Config(), cli.args.theme)
+            apply_theme(config, cli.args.theme)
         except MarkdownImageGeneratorError as e:
             logger.error("Failed to apply theme: %s", e)
             return 1
+
+    try:
+        config.validate()
+    except ConfigValidationError as e:
+        logger.error("Invalid configuration: %s", e)
+        return 1
 
     # Resolve preset dimensions
     preset_width = None
@@ -185,19 +233,14 @@ def main() -> int:
         logger.info("Using preset '%s' (%d×%d)", cli.args.preset, preset_width, preset_height)
 
     # Build renderer
-    renderer = None
-    if cli.args.renderer == "pil":
-        from src.rendering.pil_renderer import PilRenderer
-        renderer = PilRenderer()
-    else:
-        from src.rendering.playwright_renderer import PlaywrightRenderer
-        renderer = PlaywrightRenderer(
-            theme=cli.args.theme,
-            font_path=cli.args.font_path,
-            width=preset_width,
-            height=preset_height,
-            custom_css=cli.args.template,
-        )
+    renderer = build_renderer(
+        renderer_name=cli.args.renderer,
+        theme=cli.args.theme,
+        font_path=cli.args.font_path,
+        width=preset_width,
+        height=preset_height,
+        custom_css=cli.args.template,
+    )
 
     # Batch mode
     if cli.args.batch:

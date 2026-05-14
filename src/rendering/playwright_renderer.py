@@ -5,6 +5,7 @@ each slide div into a PIL Image.
 """
 
 import logging
+from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
 from typing import List, Optional
@@ -21,6 +22,25 @@ logger = logging.getLogger(__name__)
 
 # Default search path for CSS themes
 _CSS_THEMES_DIR = Path(__file__).resolve().parent.parent.parent / "themes" / "css"
+
+
+@lru_cache(maxsize=1)
+def playwright_runtime_available() -> bool:
+    """Return whether Playwright and a Chromium executable are available."""
+    try:
+        from playwright.sync_api import Error as PlaywrightError
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return False
+
+    try:
+        with sync_playwright() as pw:
+            executable_path = getattr(pw.chromium, "executable_path", None)
+    except (AttributeError, OSError, PlaywrightError, RuntimeError):
+        logger.debug("Playwright runtime probe failed", exc_info=True)
+        return False
+
+    return bool(executable_path) and Path(executable_path).is_file()
 
 
 def _load_css_theme(theme_name: str, themes_dir: Optional[Path] = None) -> str:
